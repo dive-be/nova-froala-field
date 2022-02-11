@@ -1,13 +1,9 @@
-<p align="center"><img alt="Nova Froala Field" src="docs/froala-nova.png" width="380"></p>
+<p align="center"><img alt="Nova Froala Field" src=".github/docs/froala-nova.png" width="380"></p>
 
 <p align="center"><strong>Froala WYSIWYG Editor</strong> field for Laravel Nova</p>
 
-<p align="center">
-  <a href="https://packagist.org/packages/froala/nova-froala-field"><img src="https://img.shields.io/packagist/v/froala/nova-froala-field.svg?style=flat-square" alt="Latest Version on Packagist"></img></a>
-  <a href="https://travis-ci.org/froala/nova-froala-field"><img src="https://img.shields.io/travis/froala/nova-froala-field/master.svg?style=flat-square" alt="Build Status"></img></a>
-  <a href="https://github.styleci.io/repos/151840835"><img src="https://github.styleci.io/repos/151840835/shield?branch=master" alt="Code Style Status"></a>
-  <a href="https://packagist.org/packages/froala/nova-froala-field"><img src="https://img.shields.io/packagist/dt/froala/nova-froala-field.svg?style=flat-square" alt="Total Downloads"></a>
-</p>
+[![PHP Checks and Tests](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-php.yml/badge.svg?branch=master)](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-php.yml)
+[![JS Checks and Tests](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-js.yml/badge.svg?branch=master)](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-js.yml)
 
 ## Introduction
 
