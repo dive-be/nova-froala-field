@@ -3004,10 +3004,10 @@ fresh@0.5.2:
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
   integrity sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==
 
-froala-editor@^4.0.12:
-  version "4.0.12"
-  resolved "https://registry.yarnpkg.com/froala-editor/-/froala-editor-4.0.12.tgz#b1f51e88fb27cec985770e2989ec5eaa9f1b88f4"
-  integrity sha512-y4uh6DOKYddXZNx2lGhzng8KFHqb2/yD/u9SlT9zXQDwoo4N2AtINs8F4CwDmKFDiwMMaWEpEmWWgsFYQ8fo8Q==
+froala-editor@^4.0.13:
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/froala-editor/-/froala-editor-4.0.13.tgz#cfdbdf4e56727d6429f4c513b9873d99c01e070a"
+  integrity sha512-1yWrnONJ080aBwifhwEGBd6K1V0HLg0aoZmxbTwKyf5G4JOssTdmNL+37qjxp7ZJd+ZH9ceFeeZ9gP+MGvFwJA==
 
 fs-extra@^10.0.0:
   version "10.1.0"
@@ -5623,14 +5623,14 @@ vue-eslint-parser@^7.0.0:
     lodash "^4.17.21"
     semver "^6.3.0"
 
-vue-froala-wysiwyg@^4.0.12:
-  version "4.0.12"
-  resolved "https://registry.yarnpkg.com/vue-froala-wysiwyg/-/vue-froala-wysiwyg-4.0.12.tgz#3abd9e2419db93dae344e15e3ad27e0518d91228"
-  integrity sha512-Gyj2fXUCkZTBubf7NLjsi20nAjrlo0HOkSf4eoP6zq5+DRT1jEL7jRdNltgONSLxJBm38RlIO59eTvYo5evTnQ==
+vue-froala-wysiwyg@^4.0.13:
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/vue-froala-wysiwyg/-/vue-froala-wysiwyg-4.0.13.tgz#94e557f7aa3bc9d782bedf70ea81d48adced5aa2"
+  integrity sha512-rYKExEX1st89BBTYnO+39updHBps2nSUSIOWqyzG1WZovsbypJcrBd1gwWoZ8cx+t2Bk0VLnT63XUeQ1dc1XKw==
   dependencies:
     "@babel/runtime-corejs2" "^7.7.7"
     babel-runtime "^6.26.0"
-    froala-editor "^4.0.12"
+    froala-editor "^4.0.13"
     vue "2.6.6"
 
 vue-hot-reload-api@^2.3.0:
