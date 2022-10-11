@@ -1,3 +1,9 @@
+# This package is abandoned
+
+As of October 2022 we have made the decision to migrate away from Froala. Froala has still not given any concrete plans to migrate to Vue3. Without Vue3 we cannot migrate to Nova 4, and thus we made the decision to migrate to another editor.
+
+Feel free to fork this repository if you want to keep updating it.
+
 <p align="center"><img alt="Nova Froala Field" src=".github/docs/froala-nova.png" width="380"></p>
 
 <p align="center"><strong>Froala WYSIWYG Editor</strong> field for Laravel Nova</p>
