@@ -1,26 +1,12 @@
-import TrixAttachmentsAdapter from './TrixAttachmentsAdapter';
-import FroalaAttachmentsAdapter from './FroalaAttachmentsAdapter';
+import Endpoints from './Endpoints';
 
 class MediaConfigurator {
-    constructor(resource, field, notificator) {
+    constructor(resource, field) {
         this.resource = resource;
         this.field = field;
 
-        this.notificator = notificator;
-
-        this.adapter = this._buildAdapter(this.field.attachmentsDriver);
+        this.endpoints = new Endpoints(resource, field);
         this._token = document.head.querySelector('meta[name="csrf-token"]').content;
-    }
-
-    _buildAdapter(mode) {
-        switch (mode) {
-            case 'trix':
-                return new TrixAttachmentsAdapter(this.resource, this.field);
-            case 'froala':
-                return new FroalaAttachmentsAdapter(this.resource, this.field);
-            default:
-                return new FroalaAttachmentsAdapter(this.resource, this.field);
-        }
     }
 
     getConfig() {
@@ -40,10 +26,10 @@ class MediaConfigurator {
     cleanUp() {
         if (this.field.withFiles) {
             Nova.request()
-                .delete(this.adapter.cleanUpUrl)
-                .then(response => {})
+                .delete(this.endpoints.cleanUpUrl)
+                .then(Function.prototype)
                 .catch(error => {
-                    this.notificator.show(error.message, { type: 'error' });
+                    Nova.error(error.message);
                 });
         }
     }
@@ -54,7 +40,7 @@ class MediaConfigurator {
             imageUploadParam: 'attachment',
 
             // Set the image upload URL.
-            imageUploadURL: this.adapter.imageUploadUrl,
+            imageUploadURL: this.endpoints.imageUploadUrl,
 
             // Additional upload params.
             imageUploadParams: {
@@ -72,12 +58,12 @@ class MediaConfigurator {
             events: {
                 'froalaEditor.image.removed': (e, editor, $img) => {
                     Nova.request()
-                        .delete(this.adapter.imageRemoveUrl, {
+                        .delete(this.endpoints.imageRemoveUrl, {
                             params: { attachmentUrl: $img.attr('src') },
                         })
-                        .then(response => {})
+                        .then(Function.prototype)
                         .catch(error => {
-                            this.notificator.show(error.message, { type: 'error' });
+                            Nova.error(error.message);
                         });
                 },
                 'froalaEditor.image.error': (e, editor, error, response) => {
@@ -85,21 +71,19 @@ class MediaConfigurator {
                         response = JSON.parse(response);
 
                         if (typeof response.status !== 'undefined' && response.status === 409) {
-                            this.notificator.show('A file with this name already exists.', {
-                                type: 'error',
-                            });
+                            Nova.error('A file with this name already exists.');
 
                             return;
                         }
                     } catch (e) {}
 
-                    this.notificator.show(error.message, { type: 'error' });
+                    Nova.error(error.message);
                 },
-                'froalaEditor.imageManager.error': (e, editor, error, response) => {
-                    this.notificator.show(error.message, { type: 'error' });
+                'froalaEditor.imageManager.error': (e, editor, error) => {
+                    Nova.error(error.message);
                 },
-                'froalaEditor.file.error': (e, editor, error, response) => {
-                    this.notificator.show(error.message, { type: 'error' });
+                'froalaEditor.file.error': (e, editor, error) => {
+                    Nova.error(error.message);
                 },
             },
         };
@@ -107,7 +91,7 @@ class MediaConfigurator {
 
     get imageManagerLoadConfig() {
         return {
-            imageManagerLoadURL: `/nova-vendor/froala-field/${this.resource}/image-manager`,
+            imageManagerLoadURL: this.endpoints.imageManagerUrl,
 
             imageManagerLoadParams: {
                 field: this.field.attribute,
@@ -117,7 +101,7 @@ class MediaConfigurator {
 
     get imageManagerDeleteConfig() {
         return {
-            imageManagerDeleteURL: `/nova-vendor/froala-field/${this.resource}/image-manager`,
+            imageManagerDeleteURL: this.endpoints.imageManagerUrl,
 
             imageManagerDeleteMethod: 'DELETE',
 
@@ -130,7 +114,7 @@ class MediaConfigurator {
 
     get videoUploadConfig() {
         return {
-            videoUploadURL: this.adapter.videoUploadUrl,
+            videoUploadURL: this.endpoints.videoUploadUrl,
 
             videoUploadParam: 'attachment',
 
@@ -147,7 +131,7 @@ class MediaConfigurator {
             fileUploadParam: 'attachment',
 
             // Set the file upload URL.
-            fileUploadURL: this.adapter.fileUploadUrl,
+            fileUploadURL: this.endpoints.fileUploadUrl,
 
             // Additional upload params.
             fileUploadParams: {

@@ -1,14 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests;
+namespace Tests;
 
-use function Froala\NovaFroalaField\nova_version_at_least;
-use Froala\NovaFroalaField\Tests\Fixtures\Article;
-use Froala\NovaFroalaField\Tests\Fixtures\TestServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Nova\Trix\Attachment;
 use Laravel\Nova\Trix\PendingAttachment;
+use Tests\Fixtures\Article;
+use Tests\Fixtures\TestServiceProvider;
 
 class TrixDriverUploadTest extends TestCase
 {
@@ -40,7 +39,7 @@ class TrixDriverUploadTest extends TestCase
 
         $response->assertJson(['link' => Storage::disk(static::DISK)->url($this->getAttachmentLocation())]);
 
-        $this->assertDatabaseHas((new PendingAttachment)->getTable(), [
+        $this->assertDatabaseHas((new PendingAttachment())->getTable(), [
             'draft_id' => $this->draftId,
             'disk' => static::DISK,
             'attachment' => $this->getAttachmentLocation(),
@@ -60,21 +59,12 @@ class TrixDriverUploadTest extends TestCase
 
         $response = $this->storeArticle();
 
-        if (nova_version_at_least('1.3.1')) {
-            $response->assertJson([
-                'resource' => [
-                    'title' => 'Some title',
-                    'content' => 'Some content',
-                ],
-            ]);
-        } else {
-            $response->assertJson([
-                'title' => 'Some title',
-                'content' => 'Some content',
-            ]);
-        }
+        $response->assertJson([
+            'title' => 'Some title',
+            'content' => 'Some content',
+        ]);
 
-        $this->assertDatabaseHas((new Attachment)->getTable(), [
+        $this->assertDatabaseHas((new Attachment())->getTable(), [
             'disk' => static::DISK,
             'attachment' => $this->getAttachmentLocation(),
             'url' => Storage::disk(static::DISK)->url($this->getAttachmentLocation()),
@@ -116,7 +106,7 @@ class TrixDriverUploadTest extends TestCase
             Storage::disk(static::DISK)->assertExists($fileName);
         }
 
-        $this->json('DELETE', 'nova-api/articles/trix-attachment/content/'.$this->draftId);
+        $this->json('DELETE', 'nova-api/articles/trix-attachment/content/' . $this->draftId);
 
         foreach ($fileNames as $fileName) {
             Storage::disk(static::DISK)->assertMissing($fileName);

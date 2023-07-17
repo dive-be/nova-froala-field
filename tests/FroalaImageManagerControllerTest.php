@@ -1,15 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests;
+namespace Tests;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 
-class FroalaImageManagerControllerTest extends TestCase
+final class FroalaImageManagerControllerTest extends TestCase
 {
     use UploadsHelper;
 
-    /** @test */
-    public function get_images()
+    #[Test]
+    public function get_images(): void
     {
         $images = [];
 
@@ -39,8 +40,8 @@ class FroalaImageManagerControllerTest extends TestCase
         $response->assertJsonCount(count($images));
     }
 
-    /** @test */
-    public function destroy_image()
+    #[Test]
+    public function destroy_image(): void
     {
         $src = $this->uploadPendingFile()->json('link');
 

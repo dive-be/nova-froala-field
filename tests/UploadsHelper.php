@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests;
+namespace Tests;
 
-use function Froala\NovaFroalaField\nova_version_at_least;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -27,7 +26,7 @@ trait UploadsHelper
 
     protected function regenerateUpload()
     {
-        $this->file = UploadedFile::fake()->image('picture'.random_int(1, 100).'.jpg');
+        $this->file = UploadedFile::fake()->image('picture' . random_int(1, 100) . '.jpg');
     }
 
     protected function uploadPendingFile(): TestResponse
@@ -55,6 +54,6 @@ trait UploadsHelper
     {
         $filename = $preserveFilename ? $this->file->getClientOriginalName() : $this->file->hashName();
 
-        return nova_version_at_least('2.7.0') ? rtrim(TestCase::PATH, '/').'/'.$filename : $filename;
+        return rtrim(TestCase::PATH, '/') . '/' . $filename;
     }
 }

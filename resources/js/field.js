@@ -1,11 +1,13 @@
-import 'froala-editor/js/plugins.pkgd.min.js';
+import Froala from 'vue-froala-wysiwyg';
 
-import VueFroala from 'vue-froala-wysiwyg';
+import IndexField from './components/IndexField';
+import DetailField from './components/DetailField';
+import FormField from './components/FormField';
 
-Nova.booting((Vue, router) => {
-    Vue.use(VueFroala);
+Nova.booting(app => {
+    app.use(Froala);
 
-    Vue.component('index-nova-froala-field', require('./components/IndexField').default);
-    Vue.component('detail-nova-froala-field', require('./components/DetailField').default);
-    Vue.component('form-nova-froala-field', require('./components/FormField').default);
+    app.component('index-nova-froala-field', IndexField);
+    app.component('detail-nova-froala-field', DetailField);
+    app.component('form-nova-froala-field', FormField);
 });

@@ -1,33 +1,34 @@
 <template>
     <div>
-        <a
-            class="cursor-pointer dim inline-block text-primary font-bold"
-            aria-role="button"
-            @click="toggle"
+        <a aria-role="button"
+           @click="toggle"
+           class="cursor-pointer dim inline-block text-primary font-bold"
         >
             {{ showHideLabel }}
         </a>
-        <transition name="fade">
-            <modal v-if="expanded" @modal-close="toggle">
+
+        <Transition name="fade">
+            <Modal v-if="expanded" @closing="toggle">
                 <div class="fr-view-modal bg-white rounded-lg shadow-lg overflow-hidden">
                     <div class="fr-view-modal__content p-8">
-                        <froalaView v-model="field.value"></froalaView>
+                        <FroalaView v-model="field.value"></FroalaView>
                     </div>
+
                     <div class="bg-30 px-6 py-3 flex">
                         <div class="ml-auto">
                             <button
-                                class="btn text-80 font-normal h-9 px-3 mr-3 btn-link"
-                                type="button"
-                                data-testid="cancel-button"
                                 @click.prevent="toggle"
+                                type="button"
+                                class="btn text-80 font-normal h-9 px-3 mr-3 btn-link"
+                                data-testid="cancel-button"
                             >
                                 {{ __('Close') }}
                             </button>
                         </div>
                     </div>
                 </div>
-            </modal>
-        </transition>
+            </Modal>
+        </Transition>
     </div>
 </template>
 

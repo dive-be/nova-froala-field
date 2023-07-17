@@ -1,23 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests\Fixtures;
+namespace Tests\Fixtures;
 
-use Froala\NovaFroalaField\Froala;
-use Froala\NovaFroalaField\Tests\TestCase;
+use Froala\Nova\Froala;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Resource;
+use Tests\TestCase;
 
-class TestResource extends Resource
+final class TestResource extends Resource
 {
-    public static $model = Article::class;
+    public static string $model = Article::class;
 
-    public static function uriKey()
+    public static function uriKey(): string
     {
         return 'articles';
     }
 
-    public function fields(Request $request)
+    public function fields(Request $request): array
     {
         return [
             Text::make('Title'),

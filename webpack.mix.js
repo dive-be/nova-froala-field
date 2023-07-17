@@ -1,16 +1,13 @@
 let mix = require('laravel-mix');
 
-let distPath = 'dist';
+require('./nova.mix');
 
-mix.setPublicPath(distPath)
+mix.setPublicPath('dist')
     .js('resources/js/field.js', 'js')
-    .vue({ version: 2 })
-    .sass('resources/sass/field.scss', 'css')
-    .copy(
-        'node_modules/froala-editor/css/froala_style.min.css',
-        distPath + '/css/froala_styles.min.css'
-    )
-    // -----------------
+    .vue({ version: 3 })
+    .nova('dive-be/nova-froala-field')
+    .sass('resources/scss/field.scss', 'css')
+    .copy('node_modules/froala-editor/css/froala_style.min.css', 'dist/css/froala_styles.min.css')
     .webpackConfig({
         output: {
             publicPath: '/',

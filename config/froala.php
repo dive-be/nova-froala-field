@@ -1,6 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | The disk that should be used to preserve uploaded files when attachments
+    | are enabled on an individual Froala field. This can still be overridden
+    | on a per field basis.
+    |
+    */
+
+    'disk' => env('FROALA_DISK'),
+
     /*
     |--------------------------------------------------------------------------
     | Default Editor Options
@@ -14,7 +28,7 @@ return [
     */
 
     'options' => [
-        //'key' => env('FROALA_KEY'),
+        'key' => env('FROALA_KEY'),
 
         'toolbarButtons' => [
             [
@@ -37,27 +51,6 @@ return [
             ],
         ],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Editor Attachments Driver
-    |--------------------------------------------------------------------------
-    |
-    | If you have used `Trix` previously and want to save the same flow with
-    | `Trix` attachments handlers and database tables you can use
-    | "trix" driver.
-    |
-    | *** Note that "trix" driver doesn't support image optimization
-    | and file names preservation.
-    |
-    | It is recommended to use "froala" driver to be able to automatically
-    | optimize uploaded images and preserve attachments file names.
-    |
-    | Supported: "froala", "trix"
-    |
-    */
-
-    'attachments_driver' => 'froala',
 
     /*
     |--------------------------------------------------------------------------
@@ -95,11 +88,24 @@ return [
     |
     | Optimize all uploaded images by default.
     |
-    | * Currently not supported for cloud filesystems
+    | Currently not supported for cloud filesystems
     |
     */
 
     'optimize_images' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Filesystem Path
+    |--------------------------------------------------------------------------
+    |
+    | The path that should be used to preserve uploaded files when attachments
+    | are enabled on an individual Froala field. This can still be overridden
+    | on a per field basis.
+    |
+    */
+
+    'path' => env('FROALA_PATH', DIRECTORY_SEPARATOR),
 
     /*
     |--------------------------------------------------------------------------

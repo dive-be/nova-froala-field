@@ -1,12 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
-use Froala\NovaFroalaField\Http\Controllers\FroalaImageManagerController;
-use Froala\NovaFroalaField\Http\Controllers\FroalaUploadController;
-use Illuminate\Support\Facades\Route;
+use Froala\Nova\Attachments\AttachmentController;
+use Froala\Nova\Attachments\ImageManagerController;
+use Froala\Nova\Attachments\PendingAttachmentController;
 
-Route::get('{resource}/image-manager', [FroalaImageManagerController::class, 'index']);
-Route::delete('{resource}/image-manager', [FroalaImageManagerController::class, 'destroy']);
+/** @var \Illuminate\Routing\Router $router */
 
-Route::post('{resource}/attachments/{field}', [FroalaUploadController::class, 'store']);
-Route::delete('{resource}/attachments/{field}', [FroalaUploadController::class, 'destroyAttachment']);
-Route::delete('{resource}/attachments/{field}/{draftId}', [FroalaUploadController::class, 'destroyPending']);
+$router->get('{resource}/image-manager', [ImageManagerController::class, 'index']);
+$router->delete('{resource}/image-manager', [ImageManagerController::class, 'destroy']);
+
+$router->delete('{resource}/attachments/{field}/{draftId}', [PendingAttachmentController::class, 'destroy']);
+$router->post('{resource}/attachments/{field}', [PendingAttachmentController::class, 'store']);
+$router->delete('{resource}/attachments/{field}', [AttachmentController::class, 'destroy']);

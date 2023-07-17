@@ -1,6 +1,7 @@
 {
-    "name": "pathfindermediagroup/nova-froala-field",
+    "name": "dive-be/nova-froala-field",
     "description": "A Laravel Nova Froala WYSIWYG Editor Field.",
+    "license": "MIT",
     "keywords": [
         "laravel",
         "nova",
@@ -9,72 +10,61 @@
         "froala",
         "editor"
     ],
-    "homepage": "https://github.com/pathfindermediagroup/nova-froala-field",
-    "license": "MIT",
     "authors": [
         {
-            "name": "Slava Razum",
-            "email": "modern.web.artisan@gmail.com",
-            "role": "Developer"
-        },
-        {
-            "name": "Pathfinder Media GmbH",
+            "name": "DIVE bv",
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://nova.laravel.com",
-            "only": ["laravel/nova"]
-        }
-    ],
+    "homepage": "https://github.com/dive-be/nova-froala-field",
     "require": {
-        "php": ">=8.0",
-        "laravel/nova": "^3.0",
+        "php": "^8.2",
+        "laravel/nova": "^4.12",
         "league/flysystem": "^3.0",
+        "nova-kit/nova-packages-tool": "^1.11",
         "spatie/image-optimizer": "^1.6"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.6",
-        "mockery/mockery": "^1.5",
-        "orchestra/testbench": "^7.0",
-        "phpunit/phpunit": "^9.5",
-        "roave/security-advisories": "dev-latest"
+        "laravel/pint": "^1.0",
+        "nunomaduro/larastan": "^2.0",
+        "orchestra/testbench": "^8.0",
+        "phpunit/phpunit": "^10.0"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@git.dive.be:dive/laravel-nova.git"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Froala\\NovaFroalaField\\": "src/"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+            "Froala\\Nova\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Froala\\NovaFroalaField\\Tests\\": "tests"
-        }
-    },
-    "scripts": {
-        "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-html coverage",
-        "cgl": [
-            "vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php"
-        ],
-        "cgl-ci": [
-            "vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php -v --dry-run --diff"
-        ]
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Froala\\NovaFroalaField\\FroalaFieldServiceProvider"
-            ]
+            "Tests\\": "tests"
         }
     },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "extra": {
+        "laravel": {
+            "providers": [
+                "FroalaServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "format": "@php ./vendor/bin/pint",
+        "larastan": "@php ./vendor/bin/phpstan analyse --memory-limit=2G",
+        "test": "@php ./vendor/bin/phpunit",
+        "verify": [
+            "@larastan",
+            "@test"
+        ]
+    }
 }

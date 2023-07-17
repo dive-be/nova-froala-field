@@ -1,15 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests\Fixtures;
+namespace Tests\Fixtures;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Article extends Model
+final class Article extends Model
 {
-    protected $fillable = [
-        'title',
-        'content',
-    ];
+    protected $guarded = ['id'];
 
     public $timestamps = false;
 }

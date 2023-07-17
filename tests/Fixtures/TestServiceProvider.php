@@ -1,17 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests\Fixtures;
+namespace Tests\Fixtures;
 
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\ServiceProvider;
 
-class TestServiceProvider extends ServiceProvider
+final class TestServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function register(): void
     {
-    }
-
-    public function register()
-    {
-        $this->app['config']->set('nova.froala-field.attachments_driver', 'trix');
+        $this->app[Repository::class]->set('nova.froala-field.attachments_driver', 'trix');
     }
 }

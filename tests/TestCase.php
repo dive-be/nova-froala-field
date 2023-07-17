@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests;
+namespace Tests;
 
-use Froala\NovaFroalaField\FroalaFieldServiceProvider;
-use Froala\NovaFroalaField\Tests\Fixtures\TestResource;
-use Froala\NovaFroalaField\Tests\Fixtures\User;
+use Froala\Nova\FroalaServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Laravel\Nova\Nova;
@@ -12,12 +10,14 @@ use Laravel\Nova\NovaApplicationServiceProvider;
 use Laravel\Nova\NovaCoreServiceProvider;
 use Laravel\Nova\NovaServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Tests\Fixtures\TestResource;
+use Tests\Fixtures\User;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    const DISK = 'public';
+    public const DISK = 'public';
 
-    const PATH = 'subpath';
+    public const PATH = 'subpath';
 
     public static $user;
 
@@ -48,17 +48,11 @@ abstract class TestCase extends OrchestraTestCase
             NovaCoreServiceProvider::class,
             NovaServiceProvider::class,
             NovaApplicationServiceProvider::class,
-            FroalaFieldServiceProvider::class,
+            FroalaServiceProvider::class,
         ];
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
@@ -78,7 +72,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         $this->artisan('migrate:fresh');
 
-        include_once __DIR__.'/../database/migrations/create_froala_attachment_tables.php.stub';
+        include_once __DIR__ . '/../database/migrations/create_froala_attachment_tables.php.stub';
 
         (new \CreateFroalaAttachmentTables())->up();
 

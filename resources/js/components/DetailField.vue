@@ -1,31 +1,33 @@
 <template>
-    <panel-item :field="field">
-        <template slot="value">
+    <PanelItem :field="field">
+        <template #value>
             <div v-if="field.shouldShow && hasContent">
                 <div class="markdown leading-normal">
-                    <froalaView v-model="field.value"></froalaView>
+                    <FroalaView v-model:value="field.value"></FroalaView>
                 </div>
             </div>
+
             <div v-else-if="hasContent">
                 <div v-if="expanded" class="markdown leading-normal">
-                    <froalaView v-model="field.value"></froalaView>
+                    <FroalaView v-model:value="field.value"></FroalaView>
                 </div>
 
                 <a
                     v-if="!field.shouldShow"
-                    class="cursor-pointer dim inline-block text-primary font-bold"
-                    :class="{ 'mt-6': expanded }"
                     aria-role="button"
                     @click="toggle"
+                    class="cursor-pointer dim inline-block text-primary font-bold"
+                    :class="{ 'mt-6': expanded }"
                 >
                     {{ showHideLabel }}
                 </a>
             </div>
+
             <div v-else>
                 &mdash;
             </div>
         </template>
-    </panel-item>
+    </PanelItem>
 </template>
 
 <script>
@@ -46,7 +48,7 @@ export default {
 
     methods: {
         toggle() {
-            this.expanded = !this.expanded;
+            this.expanded = ! this.expanded;
         },
     },
 };

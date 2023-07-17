@@ -1,23 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField;
+namespace Froala\Nova;
 
-use Froala\NovaFroalaField\Handlers\AttachedImagesList;
-use Froala\NovaFroalaField\Handlers\DeleteAttachments;
-use Froala\NovaFroalaField\Handlers\DetachAttachment;
-use Froala\NovaFroalaField\Handlers\DiscardPendingAttachments;
-use Froala\NovaFroalaField\Handlers\StorePendingAttachment;
-use Froala\NovaFroalaField\Models\PendingAttachment as FroalaPendingAttachment;
+use Closure;
+use Froala\Nova\Attachments\DeleteAttachments;
+use Froala\Nova\Attachments\DetachAttachment;
+use Froala\Nova\Attachments\DiscardPendingAttachments;
+use Froala\Nova\Attachments\GetAttachedImagesList;
+use Froala\Nova\Attachments\PendingAttachment;
+use Froala\Nova\Attachments\StorePendingAttachment;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Trix\PendingAttachment as TrixPendingAttachment;
 
-class Froala extends Trix
+final class Froala extends Trix
 {
-    public const DRIVER_NAME = 'froala';
-
     public $component = 'nova-froala-field';
+
+    public $meta = ['options' => []];
 
     /**
      * The callback that should be executed to return attached images list.
@@ -25,50 +26,6 @@ class Froala extends Trix
      * @var callable
      */
     public $imagesCallback;
-
-    public function __construct(string $name, ?string $attribute = null, $resolveCallback = null)
-    {
-        parent::__construct($name, $attribute, $resolveCallback);
-
-        $uploadLimits = [
-            'fileMaxSize',
-            'imageMaxSize',
-            'videoMaxSize',
-        ];
-
-        $uploadMaxFilesize = $this->getUploadMaxFilesize();
-
-        foreach ($uploadLimits as $key => $property) {
-            $uploadLimits[$property] = $uploadMaxFilesize;
-            unset($uploadLimits[$key]);
-        }
-
-        $this->withMeta([
-            'options' => config('nova.froala-field.options', []) + $uploadLimits,
-            'draftId' => Str::uuid(),
-            'attachmentsDriver' => config('nova.froala-field.attachments_driver'),
-        ]);
-    }
-
-    protected function getUploadMaxFilesize(): int
-    {
-        $uploadMaxFilesize = config('nova.froala-field.upload_max_filesize')
-                            ?? ini_get('upload_max_filesize');
-
-        if (is_numeric($uploadMaxFilesize)) {
-            return $uploadMaxFilesize;
-        }
-
-        $metric = strtoupper(substr($uploadMaxFilesize, -1));
-        $uploadMaxFilesize = (int) $uploadMaxFilesize;
-
-        return match ($metric) {
-            'K' => $uploadMaxFilesize * 1024,
-            'M' => $uploadMaxFilesize * 1048576,
-            'G' => $uploadMaxFilesize * 1073741824,
-            default => $uploadMaxFilesize,
-        };
-    }
 
     /**
      * Ability to pass any existing Froala options to the editor instance.
@@ -80,38 +37,25 @@ class Froala extends Trix
      */
     public function options(array $options): self
     {
-        return $this->withMeta([
-            'options' => array_merge($this->meta['options'], $options),
-        ]);
+        return $this->withMeta(['options' => $options]);
     }
 
     /**
-     * Specify that file uploads should not be allowed.
+     * Specify that file uploads should be allowed.
      */
-    public function withFiles($disk = null, $path = '/'): self|static
+    public function withFiles($disk = null, $path = null): self
     {
         $this->withFiles = true;
 
-        if (nova_version_at_least('2.7.0')) {
-            $this->disk($disk)->path($path);
-        } else {
-            $this->disk($disk);
-        }
-
-        if (config('nova.froala-field.attachments_driver', self::DRIVER_NAME) !== self::DRIVER_NAME) {
-            $this->images(new AttachedImagesList($this));
-
-            return parent::withFiles($disk, $path);
-        }
-
-        $this->attach(new StorePendingAttachment($this))
-            ->detach(new DetachAttachment)
+        return $this
+            ->disk($disk ?? config('nova.froala.disk', $disk))
+            ->path($path ?? config('nova.froala.path', DIRECTORY_SEPARATOR))
+            ->attach(new StorePendingAttachment($this))
+            ->detach(new DetachAttachment())
             ->delete(new DeleteAttachments($this))
-            ->discard(new DiscardPendingAttachments)
-            ->images(new AttachedImagesList($this))
+            ->discard(new DiscardPendingAttachments())
+            ->images(new GetAttachedImagesList($this))
             ->prunable();
-
-        return $this;
     }
 
     /**
@@ -121,43 +65,40 @@ class Froala extends Trix
      * @param  string $requestAttribute
      * @param  object $model
      * @param  string $attribute
-     * @return \Closure|null
+     * @return Closure|null
      */
-    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute): ?\Closure
+    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute): ?Closure
     {
-        if (isset($this->fillCallback)) {
-            return call_user_func(
-                $this->fillCallback,
-                $request,
-                $model,
-                $attribute,
-                $requestAttribute
-            );
+        if (isset($this->fillCallback) && is_callable($this->fillCallback)) {
+            return ($this->fillCallback)($request, $model, $attribute, $requestAttribute);
         }
 
-        $this->fillAttributeFromRequest(
-            $request,
-            $requestAttribute,
-            $model,
-            $attribute
-        );
+        $this->fillAttributeFromRequest($request, $requestAttribute, $model, $attribute);
 
-        if ($request->{$this->attribute.'DraftId'} && $this->withFiles) {
-            $pendingAttachmentClass =
-                config('nova.froala-field.attachments_driver', self::DRIVER_NAME) === self::DRIVER_NAME
-                ? FroalaPendingAttachment::class
-                : TrixPendingAttachment::class;
-
-            return function () use ($request, $model, $pendingAttachmentClass) {
-                $pendingAttachmentClass::persistDraft(
-                    $request->{$this->attribute.'DraftId'},
-                    $this,
-                    $model
-                );
-            };
+        if ($request->has("{$this->attribute}DraftId") && $this->withFiles) {
+            return fn () => PendingAttachment::persistAll($request->input("{$this->attribute}DraftId"), $model);
         }
 
         return null;
+    }
+
+    /**
+     * Get additional meta information to merge with the element payload.
+     *
+     * @return array<string, mixed>
+     */
+    public function meta(): array
+    {
+        $maxSize = $this->getUploadMaxFilesize();
+
+        return array_merge([
+            'draftId' => Str::orderedUuid(),
+            'options' => array_merge(
+                config('nova.froala.options', []),
+                Arr::get($this->meta, 'options', []),
+                ['fileMaxSize' => $maxSize, 'imageMaxSize' => $maxSize, 'videoMaxSize' => $maxSize]
+            ),
+        ], Arr::except($this->meta, 'options'));
     }
 
     /**
@@ -166,7 +107,7 @@ class Froala extends Trix
      * @param  callable  $imagesCallback
      * @return $this
      */
-    public function images(callable $imagesCallback): static
+    public function images(callable $imagesCallback): self
     {
         $this->withFiles = true;
 
@@ -180,9 +121,9 @@ class Froala extends Trix
      *
      * @return string|null
      */
-    public function getStorageDir(): ?string
+    public function getStorageDir(): string
     {
-        return $this->storagePath ?? '/';
+        return $this->storagePath ?? DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -192,6 +133,25 @@ class Froala extends Trix
      */
     public function getStoragePath(): string
     {
-        return '/';
+        return DIRECTORY_SEPARATOR;
+    }
+
+    protected function getUploadMaxFilesize(): int
+    {
+        $uploadMaxFilesize = config('nova.froala.upload_max_filesize') ?? ini_get('upload_max_filesize');
+
+        if (is_numeric($uploadMaxFilesize)) {
+            return $uploadMaxFilesize;
+        }
+
+        $metric = mb_strtoupper(mb_substr($uploadMaxFilesize, -1));
+        $uploadMaxFilesize = (int) $uploadMaxFilesize;
+
+        return match ($metric) {
+            'K' => $uploadMaxFilesize * 1024,
+            'M' => $uploadMaxFilesize * 1048576,
+            'G' => $uploadMaxFilesize * 1073741824,
+            default => $uploadMaxFilesize,
+        };
     }
 }

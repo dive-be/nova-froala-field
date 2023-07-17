@@ -1,12 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests;
+namespace Tests;
 
-use Froala\NovaFroalaField\Models\PendingAttachment;
+use Froala\Nova\Attachments\PendingAttachment;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 
-class PreserveFilenamesTest extends TestCase
+final class PreserveFilenamesTest extends TestCase
 {
     use UploadsHelper {
         setUp as uplaodsSetUp;
@@ -19,14 +20,14 @@ class PreserveFilenamesTest extends TestCase
         $this->app['config']->set('nova.froala-field.preserve_file_names', true);
     }
 
-    /** @test */
-    public function save_image()
+    #[Test]
+    public function save_image(): void
     {
         $response = $this->uploadPendingFile();
 
         $response->assertJson(['link' => Storage::disk(static::DISK)->url($this->getAttachmentLocation(true))]);
 
-        $this->assertDatabaseHas((new PendingAttachment)->getTable(), [
+        $this->assertDatabaseHas((new PendingAttachment())->getTable(), [
             'draft_id' => $this->draftId,
             'disk' => static::DISK,
             'attachment' => $this->getAttachmentLocation(true),
@@ -36,8 +37,8 @@ class PreserveFilenamesTest extends TestCase
         Storage::disk(static::DISK)->assertExists($this->getAttachmentLocation(true));
     }
 
-    /** @test */
-    public function same_filename_error()
+    #[Test]
+    public function same_filename_error(): void
     {
         $this->uploadPendingFile();
 
