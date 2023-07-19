@@ -2,9 +2,6 @@
 
 <p align="center"><strong>Froala WYSIWYG Editor</strong> field for Laravel Nova</p>
 
-[![PHP Checks and Tests](https://github.com/dive-be/nova-froala-field/actions/workflows/ci-php.yml/badge.svg?branch=master)](https://github.com/dive-be/nova-froala-field/actions/workflows/ci-php.yml)
-[![JS Checks and Tests](https://github.com/dive-be/nova-froala-field/actions/workflows/ci-js.yml/badge.svg?branch=master)](https://github.com/dive-be/nova-froala-field/actions/workflows/ci-js.yml)
-
 ## Introduction
 
 This is a fork of the original `froala/nova-froala-field` repository. 
@@ -32,7 +29,7 @@ class Article extends Resource
 {
     // ...
 
-    public function fields(Request $request)
+    public function fields(NovaRequest $request)
     {
         return [
             // ...
@@ -50,7 +47,7 @@ class Article extends Resource
 To change any of config values for _froala field_, publish a config file:
 
 ```bash
-php artisan vendor:publish --tag=config --provider=Froala\\Nova\\FroalaFieldServiceProvider
+php artisan vendor:publish --tag=config --provider=Froala\\Nova\\FroalaServiceProvider
 ```
 
 ## Customize Editor Options
@@ -100,7 +97,7 @@ edit `froala.options` value:
 If you want to set options only to specific field, just pass them to `options` method:
 
 ```php
-public function fields(Request $request)
+public function fields(NovaRequest $request)
 {
     return [
         // ...
@@ -117,12 +114,13 @@ public function fields(Request $request)
 
 ## Attachments
 
+> **Note** If you are not going to use Froala's attachment functionality, you should call the `Froala::ignoreMigrations` method in the register method of your application's `App\Providers\AppServiceProvider` class.
+
 **Nova Froala Field** provides native attachments driver which works similar to [Trix File Uploads](https://nova.laravel.com/docs/1.0/resources/fields.html#file-uploads), but with ability to optimize images and preserve file names.
 
-Publish and run a migration:
+Run migrations:
 
-```bash
-php artisan vendor:publish --tag=migrations --provider=Froala\\Nova\\FroalaFieldServiceProvider 
+```bash 
 php artisan migrate
 ```
 
@@ -264,7 +262,7 @@ You can set max upload filesize for attachments. If set to `null`, max upload fi
 According to _Froala_ [Display Edited Content](https://www.froala.com/wysiwyg-editor/docs/overview#frontend) documentation you should publish _Froala_ styles:
 
 ```bash
-php artisan vendor:publish --tag=froala-styles --provider=Froala\\Nova\\FroalaFieldServiceProvider 
+php artisan vendor:publish --tag=froala-styles --provider=Froala\\Nova\\FroalaServiceProvider 
 ```
 
 include into view where an edited content is shown:
@@ -298,7 +296,7 @@ Just click **Show Content**
 
 ## License Key
 
-To setup your license key, uncomment `key` option in the config file and set `FROALA_KEY` environment variable
+To setup your license key, set `FROALA_KEY` environment variable:
 
 ```php
 // ...
