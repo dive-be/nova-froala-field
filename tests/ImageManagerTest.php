@@ -49,6 +49,6 @@ final class ImageManagerTest extends KernelTestCase
 
         $this->deleteJson('nova-vendor/froala/articles/image-manager', ['src' => $src, 'field' => 'content']);
 
-        Storage::disk(static::DISK)->assertMissing($this->getAttachmentLocation());
+        Storage::disk(self::DISK)->assertMissing($this->getAttachmentLocation());
     }
 }

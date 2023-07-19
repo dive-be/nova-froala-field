@@ -17,16 +17,16 @@ final class PreserveFilenamesTest extends KernelTestCase
         $this->app['config']->set('froala.preserve_file_names', true);
         $response = $this->uploadPendingFile();
 
-        $response->assertJson(['link' => Storage::disk(static::DISK)->url($this->getAttachmentLocation(true))]);
+        $response->assertJson(['link' => Storage::disk(self::DISK)->url($this->getAttachmentLocation(true))]);
 
         $this->assertDatabaseHas((new PendingAttachment())->getTable(), [
             'draft_id' => $this->draftId,
-            'disk' => static::DISK,
+            'disk' => self::DISK,
             'attachment' => $this->getAttachmentLocation(true),
         ]);
 
         // Assert the file was stored...
-        Storage::disk(static::DISK)->assertExists($this->getAttachmentLocation(true));
+        Storage::disk(self::DISK)->assertExists($this->getAttachmentLocation(true));
     }
 
     #[Test]

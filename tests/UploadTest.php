@@ -4,7 +4,6 @@ namespace Tests;
 
 use Froala\Nova\Attachments\Attachment;
 use Froala\Nova\Attachments\PendingAttachment;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 

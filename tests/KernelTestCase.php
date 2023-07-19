@@ -17,6 +17,7 @@ abstract class KernelTestCase extends TestCase
     use RefreshDatabase;
 
     final public const DISK = 'public';
+
     final public const PATH = 'subpath';
 
     protected function defineDatabaseMigrations(): void
