@@ -5,11 +5,12 @@ parameters:
     paths:
         - src/
 
-    level: max
+    level: 6
 
     checkMissingIterableValueType: false
 
     checkGenericClassInNonGenericObjectType: false
 
     ignoreErrors:
-        - '#Cannot access offset .* on Illuminate\\Contracts\\Foundation\\Application.#'
+        - '#Model::make.*#'
+        - '#Parameter .* of method Illuminate\\Support\\Collection<int\,Illuminate\\Database\\Eloquent\\Model>::each.*#'

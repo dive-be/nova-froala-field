@@ -26,7 +26,7 @@ final class PendingAttachment extends Model
 
     protected $guarded = ['id'];
 
-    protected $table = 'nova_pending_froala_attachments';
+    protected $table = 'pending_froala_attachments';
 
     public static function forDraft(string $draftId): Builder
     {
@@ -55,11 +55,11 @@ final class PendingAttachment extends Model
         return Attribute::get(fn () => Storage::disk($this->disk)->url($this->attachment));
     }
 
-    public function prune(): void
+    public function prune(): bool
     {
         Storage::disk($this->disk)->delete($this->attachment);
 
-        $this->delete();
+        return $this->delete();
     }
 
     public function prunable(): Builder

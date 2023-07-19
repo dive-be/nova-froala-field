@@ -16,7 +16,11 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 
 final class Froala extends Trix
 {
-    public $component = 'froala-field';
+    public const NAME = 'froala-field';
+
+    public static bool $runsMigrations = true;
+
+    public $component = self::NAME;
 
     public $meta = ['options' => []];
 
@@ -31,9 +35,6 @@ final class Froala extends Trix
      * Ability to pass any existing Froala options to the editor instance.
      * Refer to the Froala documentation {@link https://www.froala.com/wysiwyg-editor/docs/options}
      * to view a list of all available options.
-     *
-     * @param array $options
-     * @return self
      */
     public function options(array $options): self
     {
@@ -60,23 +61,17 @@ final class Froala extends Trix
 
     /**
      * Hydrate the given attribute on the model based on the incoming request.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
-     * @param  string $requestAttribute
-     * @param  object $model
-     * @param  string $attribute
-     * @return Closure|null
      */
     protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute): ?Closure
     {
-        if (isset($this->fillCallback) && is_callable($this->fillCallback)) {
+        if (is_callable($this->fillCallback)) {
             return ($this->fillCallback)($request, $model, $attribute, $requestAttribute);
         }
 
         $this->fillAttributeFromRequest($request, $requestAttribute, $model, $attribute);
 
-        if ($request->has("{$this->attribute}DraftId") && $this->withFiles) {
-            return fn () => PendingAttachment::persistAll($request->input("{$this->attribute}DraftId"), $model);
+        if ($request->has($draftId = "{$this->attribute}DraftId") && $this->withFiles) {
+            return fn () => PendingAttachment::persistAll($request->input($draftId), $model);
         }
 
         return null;
@@ -84,8 +79,6 @@ final class Froala extends Trix
 
     /**
      * Get additional meta information to merge with the element payload.
-     *
-     * @return array<string, mixed>
      */
     public function meta(): array
     {
@@ -103,9 +96,6 @@ final class Froala extends Trix
 
     /**
      * Specify the callback that should be used to get attached images list.
-     *
-     * @param  callable  $imagesCallback
-     * @return $this
      */
     public function images(callable $imagesCallback): self
     {
@@ -118,18 +108,14 @@ final class Froala extends Trix
 
     /**
      * Get the path that the field is stored at on disk.
-     *
-     * @return string|null
      */
     public function getStorageDir(): string
     {
-        return $this->storagePath ?? DIRECTORY_SEPARATOR;
+        return $this->storagePath;
     }
 
     /**
      * Get the full path that the field is stored at on disk.
-     *
-     * @return string
      */
     public function getStoragePath(): string
     {
@@ -153,5 +139,13 @@ final class Froala extends Trix
             'G' => $uploadMaxFilesize * 1073741824,
             default => $uploadMaxFilesize,
         };
+    }
+
+    /**
+     * Configure Froala to not register its migrations.
+     */
+    public static function ignoreMigrations(): void
+    {
+        self::$runsMigrations = false;
     }
 }

@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Fixtures;
+namespace Tests;
 
 use Froala\Nova\Froala;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Resource;
-use Tests\TestCase;
 
-final class TestResource extends Resource
+final class ArticleResource extends Resource
 {
     public static string $model = Article::class;
 
@@ -21,7 +20,7 @@ final class TestResource extends Resource
     {
         return [
             Text::make('Title'),
-            Froala::make('Content')->withFiles(TestCase::DISK, TestCase::PATH),
+            Froala::make('Content')->withFiles(),
         ];
     }
 }

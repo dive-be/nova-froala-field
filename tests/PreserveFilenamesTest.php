@@ -7,22 +7,14 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 
-final class PreserveFilenamesTest extends TestCase
+final class PreserveFilenamesTest extends KernelTestCase
 {
-    use UploadsHelper {
-        setUp as uplaodsSetUp;
-    }
-
-    public function setUp(): void
-    {
-        $this->uplaodsSetUp();
-
-        $this->app['config']->set('froala-field.preserve_file_names', true);
-    }
+    use UploadsHelper;
 
     #[Test]
     public function save_image(): void
     {
+        $this->app['config']->set('froala.preserve_file_names', true);
         $response = $this->uploadPendingFile();
 
         $response->assertJson(['link' => Storage::disk(static::DISK)->url($this->getAttachmentLocation(true))]);
@@ -40,6 +32,7 @@ final class PreserveFilenamesTest extends TestCase
     #[Test]
     public function same_filename_error(): void
     {
+        $this->app['config']->set('froala.preserve_file_names', true);
         $this->uploadPendingFile();
 
         $response = $this->uploadPendingFile();

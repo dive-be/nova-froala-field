@@ -9,6 +9,6 @@ use Froala\Nova\Attachments\PendingAttachmentController;
 $router->get('{resource}/image-manager', [ImageManagerController::class, 'index']);
 $router->delete('{resource}/image-manager', [ImageManagerController::class, 'destroy']);
 
-$router->delete('{resource}/attachments/{field}/{draftId}', [PendingAttachmentController::class, 'destroy']);
 $router->post('{resource}/attachments/{field}', [PendingAttachmentController::class, 'store']);
 $router->delete('{resource}/attachments/{field}', [AttachmentController::class, 'destroy']);
+$router->delete('{resource}/attachments/{field}/{draftId}', [PendingAttachmentController::class, 'destroy']);

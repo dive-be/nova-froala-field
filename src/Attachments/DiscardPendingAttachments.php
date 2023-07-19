@@ -8,8 +8,8 @@ final readonly class DiscardPendingAttachments
 {
     public function __invoke(Request $request): void
     {
-        PendingAttachment::forDraft($request->input('draftId'))
+        PendingAttachment::forDraft($request->route('draftId'))
             ->get()
-            ->each(static fn (PendingAttachment $attachment) => $attachment->prune());
+            ->each(static fn (PendingAttachment $a) => $a->prune());
     }
 }

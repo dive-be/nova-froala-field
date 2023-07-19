@@ -10,6 +10,6 @@ final readonly class DetachAttachment
     {
         Attachment::forUrl($request->input('src'))
             ->get()
-            ->each(static fn (Attachment $attachment) => $attachment->prune());
+            ->each(static fn (Attachment $a) => $a->prune());
     }
 }

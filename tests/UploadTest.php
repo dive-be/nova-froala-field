@@ -4,11 +4,11 @@ namespace Tests;
 
 use Froala\Nova\Attachments\Attachment;
 use Froala\Nova\Attachments\PendingAttachment;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Fixtures\Article;
 
-final class FroalaUploadControllerTest extends TestCase
+final class UploadTest extends KernelTestCase
 {
     use UploadsHelper;
 
@@ -17,19 +17,19 @@ final class FroalaUploadControllerTest extends TestCase
     {
         $response = $this->uploadPendingFile();
 
-        $response->assertJson(['link' => Storage::disk(static::DISK)->url($this->getAttachmentLocation())]);
+        $response->assertJson(['link' => Storage::disk(self::DISK)->url($this->getAttachmentLocation())]);
 
-        $this->assertDatabaseHas((new PendingAttachment())->getTable(), [
+        $this->assertDatabaseHas(PendingAttachment::class, [
             'draft_id' => $this->draftId,
-            'disk' => static::DISK,
+            'disk' => self::DISK,
             'attachment' => $this->getAttachmentLocation(),
         ]);
 
         // Assert the file was stored...
-        Storage::disk(static::DISK)->assertExists($this->getAttachmentLocation());
+        Storage::disk(self::DISK)->assertExists($this->getAttachmentLocation());
 
         // Assert a file does not exist...
-        Storage::disk(static::DISK)->assertMissing('missing.jpg');
+        Storage::disk(self::DISK)->assertMissing('missing.jpg');
     }
 
     #[Test]
@@ -39,19 +39,13 @@ final class FroalaUploadControllerTest extends TestCase
 
         $response = $this->storeArticle();
 
-        $response->assertJson([
-            'resource' => [
-                'title' => 'Some title',
-                'content' => 'Some content',
-            ],
-        ]);
-
-        $this->assertDatabaseHas((new Attachment())->getTable(), [
-            'disk' => static::DISK,
-            'attachment' => $this->getAttachmentLocation(),
-            'url' => Storage::disk(static::DISK)->url($this->getAttachmentLocation()),
+        $response->assertJson(['resource' => ['title' => 'Some title', 'content' => 'Some content']]);
+        $this->assertDatabaseHas(Attachment::class, [
             'attachable_id' => $response->json('id'),
             'attachable_type' => Article::class,
+            'attachment' => $this->getAttachmentLocation(),
+            'disk' => self::DISK,
+            'url' => Storage::disk(self::DISK)->url($this->getAttachmentLocation()),
         ]);
     }
 
@@ -59,23 +53,19 @@ final class FroalaUploadControllerTest extends TestCase
     public function detach_attachment(): void
     {
         $src = $this->uploadPendingFile()->json('link');
-
         $this->storeArticle();
 
-        Storage::disk(static::DISK)->assertExists($this->getAttachmentLocation());
+        Storage::disk(self::DISK)->assertExists($this->getAttachmentLocation());
 
-        $this->json('DELETE', 'nova-vendor/froala-field/articles/attachments/content', [
-            'src' => $src,
-        ]);
+        $this->deleteJson('nova-vendor/froala/articles/attachments/content', ['src' => $src]);
 
-        Storage::disk(static::DISK)->assertMissing($this->getAttachmentLocation());
+        Storage::disk(self::DISK)->assertMissing($this->getAttachmentLocation());
     }
 
     #[Test]
     public function discard_pending_attachments(): void
     {
         $fileNames = [];
-
         for ($i = 0; $i <= 3; $i++) {
             $this->uploadPendingFile();
 
@@ -85,13 +75,13 @@ final class FroalaUploadControllerTest extends TestCase
         }
 
         foreach ($fileNames as $fileName) {
-            Storage::disk(static::DISK)->assertExists($fileName);
+            Storage::disk(self::DISK)->assertExists($fileName);
         }
 
-        $this->json('DELETE', 'nova-vendor/froala-field/articles/attachments/content/' . $this->draftId);
+        $this->deleteJson("nova-vendor/froala/articles/attachments/content/{$this->draftId}");
 
         foreach ($fileNames as $fileName) {
-            Storage::disk(static::DISK)->assertMissing($fileName);
+            Storage::disk(self::DISK)->assertMissing($fileName);
         }
     }
 
@@ -99,7 +89,6 @@ final class FroalaUploadControllerTest extends TestCase
     public function delete_all_related_attachments(): void
     {
         $fileNames = [];
-
         for ($i = 0; $i <= 5; $i++) {
             $this->uploadPendingFile();
 
@@ -109,17 +98,14 @@ final class FroalaUploadControllerTest extends TestCase
         }
 
         foreach ($fileNames as $fileName) {
-            Storage::disk(static::DISK)->assertExists($fileName);
+            Storage::disk(self::DISK)->assertExists($fileName);
         }
 
         $articleResponse = $this->storeArticle();
-
-        $this->json('DELETE', 'nova-api/articles', [
-            'resources' => [(int) $articleResponse->json('id')],
-        ]);
+        $this->deleteJson('nova-api/articles', ['resources' => [$articleResponse->json('id')]]);
 
         foreach ($fileNames as $fileName) {
-            Storage::disk(static::DISK)->assertMissing($fileName);
+            Storage::disk(self::DISK)->assertMissing($fileName);
         }
     }
 }

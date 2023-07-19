@@ -24,7 +24,7 @@ final readonly class StorePendingAttachment
             'disk' => $this->field->disk,
         ])->attachment;
 
-        $this->imageOptimize($attachment);
+        $this->optimize($attachment);
 
         return Storage::disk($this->field->disk)->url($attachment);
     }
@@ -39,7 +39,7 @@ final readonly class StorePendingAttachment
     }
 
     // TODO - Make work for cloud filesystems
-    private function imageOptimize(string $attachment): void
+    private function optimize(string $attachment): void
     {
         if (config('froala.optimize_images')) {
             $optimizerChain = OptimizerChainFactory::create();

@@ -15,7 +15,7 @@ final readonly class DeleteAttachments
         Attachment::query()
             ->whereMorphedTo('attachable', $model)
             ->get()
-            ->each(static fn (Attachment $attachment) => $attachment->prune());
+            ->each(static fn (Attachment $a) => $a->prune());
 
         return [$this->field->attribute => ''];
     }

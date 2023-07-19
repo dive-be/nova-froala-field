@@ -28,7 +28,7 @@ final class Attachment extends Model
 
     protected $guarded = ['id'];
 
-    protected $table = 'nova_froala_attachments';
+    protected $table = 'froala_attachments';
 
     public static function forUrl(string $url): Builder
     {
@@ -45,10 +45,10 @@ final class Attachment extends Model
         return $this->morphTo();
     }
 
-    public function prune(): void
+    public function prune(): bool
     {
         Storage::disk($this->disk)->delete($this->attachment);
 
-        $this->delete();
+        return $this->delete();
     }
 }

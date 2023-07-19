@@ -11,11 +11,15 @@ abstract readonly class Controller
     /** @throws NotFoundHttpException */
     protected function getOrThrow(NovaRequest $request): Froala
     {
-        return $request
+        $field = $request
             ->newResource()
             ->availableFields($request)
-            ->findFieldByAttribute($request->field, static fn () => throw new NotFoundHttpException());
+            ->findFieldByAttribute($request->field);
 
-        // TODO - This should work with Flexible content
+        if (! $field instanceof Froala) {
+            throw new NotFoundHttpException();
+        }
+
+        return $field;
     }
 }

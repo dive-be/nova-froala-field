@@ -8,44 +8,56 @@ use NovaKit\NovaPackagesTool\LaravelServiceProvider;
 
 final class FroalaServiceProvider extends AggregateServiceProvider
 {
+    public const NAME = 'froala';
+
     protected $providers = [LaravelServiceProvider::class];
+
+    private string $name = self::NAME;
 
     public function boot(): void
     {
-        $this->app->booted($this->routes(...));
-
-        Nova::serving(static function () {
-            Nova::script('froala-field', __DIR__ . '/../dist/js/field.js');
-            Nova::style('froala-field', __DIR__ . '/../dist/css/field.css');
-        });
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../dist/css/froala_styles.min.css' => $this->app->publicPath('css/vendor/froala_styles.min.css'),
-            ], 'froala-styles');
-
-            $this->publishes([
-                __DIR__ . '/../config/froala.php' => $this->app->configPath('froala.php'),
-            ], 'froala-config');
-
-            if (! class_exists('CreateFroalaAttachmentTables')) {
-                $timestamp = date('Y_m_d_His', time());
-
-                $this->publishes([
-                    __DIR__ . '/../database/migrations/create_froala_attachment_tables.php.stub' => $this->app->databasePath("migrations/{$timestamp}_create_froala_attachment_tables.php"),
-                ], 'froala-migrations');
-            }
-        }
+        $this->registerAssets();
+        $this->registerMigrations();
+        $this->registerPublishables();
+        $this->registerRoutes();
     }
 
     public function register(): void
     {
         parent::register();
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/froala.php', 'froala');
+        $this->mergeConfigFrom(__DIR__ . "/../config/{$this->name}.php", self::NAME);
     }
 
-    protected function routes(): void
+    private function registerAssets(): void
+    {
+        Nova::serving(static function () {
+            Nova::script(Froala::NAME, __DIR__ . '/../dist/js/field.js');
+            Nova::style(Froala::NAME, __DIR__ . '/../dist/css/field.css');
+        });
+    }
+
+    private function registerMigrations(): void
+    {
+        if ($this->app->runningInConsole() && Froala::$runsMigrations) {
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        }
+    }
+
+    private function registerPublishables(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . "/../dist/css/{$this->name}_styles.min.css" => $this->app->publicPath("css/vendor/{$this->name}_styles.min.css"),
+            ], "{$this->name}-styles");
+
+            $this->publishes([
+                __DIR__ . "/../config/{$this->name}.php" => $this->app->configPath("{$this->name}.php"),
+            ], "{$this->name}-config");
+        }
+    }
+
+    private function registerRoutes(): void
     {
         if ($this->app->routesAreCached()) {
             return;
@@ -53,7 +65,7 @@ final class FroalaServiceProvider extends AggregateServiceProvider
 
         $this->app['router']->group([
             'middleware' => 'nova',
-            'prefix' => 'nova-vendor/froala',
+            'prefix' => "nova-vendor/{$this->name}",
         ], __DIR__ . '/../routes/api.php');
     }
 }

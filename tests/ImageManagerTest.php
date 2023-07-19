@@ -5,7 +5,7 @@ namespace Tests;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 
-final class FroalaImageManagerControllerTest extends TestCase
+final class ImageManagerTest extends KernelTestCase
 {
     use UploadsHelper;
 
@@ -17,7 +17,7 @@ final class FroalaImageManagerControllerTest extends TestCase
         for ($i = 0; $i <= 10; $i++) {
             $this->uploadPendingFile();
 
-            $url = Storage::disk(TestCase::DISK)->url($this->getAttachmentLocation());
+            $url = Storage::disk(KernelTestCase::DISK)->url($this->getAttachmentLocation());
 
             $images[] = [
                 'url' => $url,
@@ -27,7 +27,7 @@ final class FroalaImageManagerControllerTest extends TestCase
             $this->regenerateUpload();
         }
 
-        $response = $this->get('nova-vendor/froala-field/articles/image-manager?field=content');
+        $response = $this->get('nova-vendor/froala/articles/image-manager?field=content');
 
         usort($images, function ($a, $b) {
             return strcasecmp($a['url'], $b['url']);
@@ -47,10 +47,7 @@ final class FroalaImageManagerControllerTest extends TestCase
 
         $this->storeArticle();
 
-        $this->json('DELETE', 'nova-vendor/froala-field/articles/image-manager', [
-            'src' => $src,
-            'field' => 'content',
-        ]);
+        $this->deleteJson('nova-vendor/froala/articles/image-manager', ['src' => $src, 'field' => 'content']);
 
         Storage::disk(static::DISK)->assertMissing($this->getAttachmentLocation());
     }

@@ -4,11 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-final class CreateFroalaAttachmentTables extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('nova_pending_froala_attachments', static function (Blueprint $table) {
+        Schema::create('pending_froala_attachments', static function (Blueprint $table) {
             $table->id();
             $table->string('draft_id')->index();
             $table->string('attachment');
@@ -16,7 +15,7 @@ final class CreateFroalaAttachmentTables extends Migration
             $table->timestamps();
         });
 
-        Schema::create('nova_froala_attachments', static function (Blueprint $table) {
+        Schema::create('froala_attachments', static function (Blueprint $table) {
             $table->id();
             $table->morphs('attachable');
             $table->string('attachment');
@@ -28,7 +27,7 @@ final class CreateFroalaAttachmentTables extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('nova_pending_froala_attachments');
-        Schema::dropIfExists('nova_froala_attachments');
+        Schema::dropIfExists('pending_froala_attachments');
+        Schema::dropIfExists('froala_attachments');
     }
-}
+};
