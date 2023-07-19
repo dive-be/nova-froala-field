@@ -32,8 +32,8 @@
     },
     "repositories": [
         {
-            "type": "vcs",
-            "url": "git@git.dive.be:dive/laravel-nova.git"
+            "type": "composer",
+            "url": "https://nova.laravel.com"
         }
     ],
     "minimum-stability": "dev",
