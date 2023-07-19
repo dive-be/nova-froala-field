@@ -1,3 +1,5 @@
+import 'froala-editor/js/plugins.pkgd.min.js';
+
 import Froala from 'vue-froala-wysiwyg';
 
 import IndexField from './components/IndexField';
