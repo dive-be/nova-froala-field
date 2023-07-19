@@ -56,7 +56,7 @@ php artisan vendor:publish --tag=config --provider=Froala\\Nova\\FroalaFieldServ
 ## Customize Editor Options
 
 For changing any [Available Froala Option](https://www.froala.com/wysiwyg-editor/docs/options)
-edit `nova.froala-field.options` value:
+edit `froala.options` value:
 
 ```php
 /*

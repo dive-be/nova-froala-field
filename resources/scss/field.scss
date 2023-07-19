@@ -1,11 +1,7 @@
 @import "~froala-editor/css/froala_editor.pkgd.min.css";
 @import "~froala-editor/css/froala_style.min.css";
 
-.fr-view-modal {
-  width: 75vw;
-}
-
 .fr-view-modal__content {
   max-height: 80vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }

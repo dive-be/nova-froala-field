@@ -7,7 +7,7 @@ import FormField from './components/FormField';
 Nova.booting(app => {
     app.use(Froala);
 
-    app.component('index-nova-froala-field', IndexField);
-    app.component('detail-nova-froala-field', DetailField);
-    app.component('form-nova-froala-field', FormField);
+    app.component('index-froala-field', IndexField);
+    app.component('detail-froala-field', DetailField);
+    app.component('form-froala-field', FormField);
 });

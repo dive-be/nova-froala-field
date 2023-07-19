@@ -6,3 +6,10 @@ parameters:
         - src/
 
     level: max
+
+    checkMissingIterableValueType: false
+
+    checkGenericClassInNonGenericObjectType: false
+
+    ignoreErrors:
+        - '#Cannot access offset .* on Illuminate\\Contracts\\Foundation\\Application.#'

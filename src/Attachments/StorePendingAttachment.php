@@ -18,7 +18,7 @@ final readonly class StorePendingAttachment
 
         $attachment = PendingAttachment::create([
             'draft_id' => $request->input('draftId'),
-            'attachment' => config('nova.froala.preserve_file_names')
+            'attachment' => config('froala.preserve_file_names')
                 ? $request->attachment->storeAs($this->field->getStorageDir(), $request->attachment->getClientOriginalName(), $this->field->disk)
                 : $request->attachment->store($this->field->getStorageDir(), $this->field->disk),
             'disk' => $this->field->disk,
@@ -35,16 +35,16 @@ final readonly class StorePendingAttachment
             . DIRECTORY_SEPARATOR
             . $request->attachment->getClientOriginalName();
 
-        abort_if(config('nova.froala.preserve_file_names') && Storage::disk($this->field->disk)->exists($path), Response::HTTP_CONFLICT);
+        abort_if(config('froala.preserve_file_names') && Storage::disk($this->field->disk)->exists($path), Response::HTTP_CONFLICT);
     }
 
     // TODO - Make work for cloud filesystems
     private function imageOptimize(string $attachment): void
     {
-        if (config('nova.froala.optimize_images')) {
+        if (config('froala.optimize_images')) {
             $optimizerChain = OptimizerChainFactory::create();
 
-            if (count($optimizers = config('nova.froala.image_optimizers'))) {
+            if (count($optimizers = config('froala.image_optimizers'))) {
                 $optimizers = array_map(
                     static function (array $optimizerOptions, string $optimizerClassName) {
                         return (new $optimizerClassName())->setOptions($optimizerOptions);

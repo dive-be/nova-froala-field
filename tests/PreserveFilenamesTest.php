@@ -17,7 +17,7 @@ final class PreserveFilenamesTest extends TestCase
     {
         $this->uplaodsSetUp();
 
-        $this->app['config']->set('nova.froala-field.preserve_file_names', true);
+        $this->app['config']->set('froala-field.preserve_file_names', true);
     }
 
     #[Test]

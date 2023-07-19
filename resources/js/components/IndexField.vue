@@ -1,34 +1,28 @@
 <template>
     <div>
-        <a aria-role="button"
-           @click="toggle"
-           class="cursor-pointer dim inline-block text-primary font-bold"
-        >
+        <button @click.stop="open" class="cursor-pointer text-primary-500 font-bold hover:opacity-75">
             {{ showHideLabel }}
-        </a>
+        </button>
 
-        <Transition name="fade">
-            <Modal v-if="expanded" @closing="toggle">
-                <div class="fr-view-modal bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="fr-view-modal__content p-8">
-                        <FroalaView v-model="field.value"></FroalaView>
-                    </div>
+        <Modal @close-via-escape="close" :show="expanded" size="3xl">
+            <ModalHeader v-text="__(`${resourceName} Content`)" class="bg-white dark:bg-gray-800 rounded-t-lg" />
 
-                    <div class="bg-30 px-6 py-3 flex">
-                        <div class="ml-auto">
-                            <button
-                                @click.prevent="toggle"
-                                type="button"
-                                class="btn text-80 font-normal h-9 px-3 mr-3 btn-link"
-                                data-testid="cancel-button"
-                            >
-                                {{ __('Close') }}
-                            </button>
-                        </div>
-                    </div>
+            <ModalContent class="bg-white dark:bg-gray-800 shadow-lg overflow-hidden">
+                <div class="fr-view-modal__content py-4">
+                    <FroalaView :value="fieldValue"></FroalaView>
                 </div>
-            </Modal>
-        </Transition>
+            </ModalContent>
+
+            <ModalFooter class="flex items-center ml-auto rounded-b-lg">
+                <LinkButton
+                    type="button"
+                    @click.prevent="close"
+                    class="ml-auto mr-3"
+                >
+                    {{ __('Close') }}
+                </LinkButton>
+            </ModalFooter>
+        </Modal>
     </div>
 </template>
 
@@ -39,14 +33,22 @@ export default {
     data: () => ({ expanded: false }),
 
     computed: {
+        fieldValue() {
+            return this.field.displayedAs || this.field.value;
+        },
+
         showHideLabel() {
-            return !this.expanded ? this.__('Show Content') : this.__('Hide Content');
+            return this.expanded ? this.__('Hide Content') : this.__('Show Content');
         },
     },
 
     methods: {
-        toggle() {
-            this.expanded = !this.expanded;
+        close() {
+            this.expanded = false;
+        },
+
+        open() {
+            this.expanded = true;
         },
     },
 };

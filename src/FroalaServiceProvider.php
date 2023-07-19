@@ -15,8 +15,8 @@ final class FroalaServiceProvider extends AggregateServiceProvider
         $this->app->booted($this->routes(...));
 
         Nova::serving(static function () {
-            Nova::script('nova-froala-field', __DIR__ . '/../dist/js/field.js');
-            Nova::style('nova-froala-field', __DIR__ . '/../dist/css/field.css');
+            Nova::script('froala-field', __DIR__ . '/../dist/js/field.js');
+            Nova::style('froala-field', __DIR__ . '/../dist/css/field.css');
         });
 
         if ($this->app->runningInConsole()) {
@@ -25,7 +25,7 @@ final class FroalaServiceProvider extends AggregateServiceProvider
             ], 'froala-styles');
 
             $this->publishes([
-                __DIR__ . '/../config/froala.php' => $this->app->configPath('nova/froala.php'),
+                __DIR__ . '/../config/froala.php' => $this->app->configPath('froala.php'),
             ], 'froala-config');
 
             if (! class_exists('CreateFroalaAttachmentTables')) {
@@ -42,7 +42,7 @@ final class FroalaServiceProvider extends AggregateServiceProvider
     {
         parent::register();
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/froala.php', 'nova.froala');
+        $this->mergeConfigFrom(__DIR__ . '/../config/froala.php', 'froala');
     }
 
     protected function routes(): void

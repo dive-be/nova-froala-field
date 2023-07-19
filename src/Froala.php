@@ -16,7 +16,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 
 final class Froala extends Trix
 {
-    public $component = 'nova-froala-field';
+    public $component = 'froala-field';
 
     public $meta = ['options' => []];
 
@@ -48,8 +48,8 @@ final class Froala extends Trix
         $this->withFiles = true;
 
         return $this
-            ->disk($disk ?? config('nova.froala.disk', $disk))
-            ->path($path ?? config('nova.froala.path', DIRECTORY_SEPARATOR))
+            ->disk($disk ?? config('froala.disk', $disk))
+            ->path($path ?? config('froala.path', DIRECTORY_SEPARATOR))
             ->attach(new StorePendingAttachment($this))
             ->detach(new DetachAttachment())
             ->delete(new DeleteAttachments($this))
@@ -94,7 +94,7 @@ final class Froala extends Trix
         return array_merge([
             'draftId' => Str::orderedUuid(),
             'options' => array_merge(
-                config('nova.froala.options', []),
+                config('froala.options', []),
                 Arr::get($this->meta, 'options', []),
                 ['fileMaxSize' => $maxSize, 'imageMaxSize' => $maxSize, 'videoMaxSize' => $maxSize]
             ),
@@ -138,7 +138,7 @@ final class Froala extends Trix
 
     protected function getUploadMaxFilesize(): int
     {
-        $uploadMaxFilesize = config('nova.froala.upload_max_filesize') ?? ini_get('upload_max_filesize');
+        $uploadMaxFilesize = config('froala.upload_max_filesize') ?? ini_get('upload_max_filesize');
 
         if (is_numeric($uploadMaxFilesize)) {
             return $uploadMaxFilesize;
