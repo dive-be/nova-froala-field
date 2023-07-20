@@ -15,8 +15,8 @@ final readonly class GetAttachedImagesList
     {
         $disk = Storage::disk($this->field->disk);
 
-        return Collection::make($disk->allFiles())
-            ->filter(static fn (string $file) => str_starts_with($disk->mimeType($file), 'image'))
+        return Collection::make($disk->allFiles(config('froala.path')))
+            ->filter(static fn (string $file) => str_starts_with((string) $disk->mimeType($file), 'image'))
             ->map($disk->url(...))
             ->map(static fn (string $url) => ['thumb' => $url, 'url' => $url]);
     }

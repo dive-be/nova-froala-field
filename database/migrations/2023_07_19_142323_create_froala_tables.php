@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('pending_froala_attachments', static function (Blueprint $table) {
+        Schema::create('froala_pending_attachments', static function (Blueprint $table) {
             $table->id();
             $table->string('draft_id')->index();
             $table->string('attachment');
@@ -27,7 +27,7 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('pending_froala_attachments');
+        Schema::dropIfExists('froala_pending_attachments');
         Schema::dropIfExists('froala_attachments');
     }
 };

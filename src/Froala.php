@@ -111,7 +111,15 @@ final class Froala extends Trix
      */
     public function getStorageDir(): string
     {
-        return $this->storagePath;
+        return config('froala.path', $this->storagePath);
+    }
+
+    /**
+     * Get the disk that the field is stored on.
+     */
+    public function getStorageDisk(): string
+    {
+        return config('froala.disk', $this->disk);
     }
 
     /**

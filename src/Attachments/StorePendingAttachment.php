@@ -5,6 +5,7 @@ namespace Froala\Nova\Attachments;
 use Froala\Nova\Froala;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
 
@@ -14,49 +15,42 @@ final readonly class StorePendingAttachment
 
     public function __invoke(Request $request): string
     {
-        $this->abortIfFileNameExists($request);
+        $this->abortIfFileNameExists($attachment = $request->file('attachment'));
+        $attachment = $this->optimize($attachment);
 
-        $attachment = PendingAttachment::create([
+        $pendingAttachment = PendingAttachment::create([
             'draft_id' => $request->input('draftId'),
-            'attachment' => config('froala.preserve_file_names')
-                ? $request->attachment->storeAs($this->field->getStorageDir(), $request->attachment->getClientOriginalName(), $this->field->disk)
-                : $request->attachment->store($this->field->getStorageDir(), $this->field->disk),
-            'disk' => $this->field->disk,
-        ])->attachment;
+            'attachment' => $this->store($attachment),
+            'disk' => $this->field->getStorageDisk(),
+        ]);
 
-        $this->optimize($attachment);
-
-        return Storage::disk($this->field->disk)->url($attachment);
+        return Storage::disk($this->field->getStorageDisk())->url($pendingAttachment->attachment);
     }
 
-    private function abortIfFileNameExists(Request $request): void
+    private function abortIfFileNameExists(UploadedFile $image): void
     {
-        $path = rtrim($this->field->getStorageDir(), DIRECTORY_SEPARATOR)
-            . DIRECTORY_SEPARATOR
-            . $request->attachment->getClientOriginalName();
+        $path = rtrim($this->field->getStorageDir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $image->getClientOriginalName();
 
-        abort_if(config('froala.preserve_file_names') && Storage::disk($this->field->disk)->exists($path), Response::HTTP_CONFLICT);
+        abort_if(config('froala.preserve_file_names') && Storage::disk($this->field->getStorageDisk())->exists($path), Response::HTTP_CONFLICT);
     }
 
-    // TODO - Make work for cloud filesystems
-    private function optimize(string $attachment): void
+    private function optimize(UploadedFile $image): UploadedFile
     {
-        if (config('froala.optimize_images')) {
-            $optimizerChain = OptimizerChainFactory::create();
-
-            if (count($optimizers = config('froala.image_optimizers'))) {
-                $optimizers = array_map(
-                    static function (array $optimizerOptions, string $optimizerClassName) {
-                        return (new $optimizerClassName())->setOptions($optimizerOptions);
-                    },
-                    $optimizers,
-                    array_keys($optimizers)
-                );
-
-                $optimizerChain->setOptimizers($optimizers);
-            }
-
-            $optimizerChain->optimize(Storage::disk($this->field->disk)->path($attachment));
+        if (! config('froala.optimize_images')) {
+            return $image;
         }
+
+        OptimizerChainFactory::create()->optimize(
+            $image->getPathname()
+        );
+
+        return $image;
+    }
+
+    private function store(UploadedFile $image): string
+    {
+        return config('froala.preserve_file_names')
+            ? $image->storeAs($this->field->getStorageDir(), $image->getClientOriginalName(), $this->field->getStorageDisk())
+            : $image->store($this->field->getStorageDir(), $this->field->getStorageDisk());
     }
 }

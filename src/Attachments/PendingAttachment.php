@@ -26,7 +26,7 @@ final class PendingAttachment extends Model
 
     protected $guarded = ['id'];
 
-    protected $table = 'pending_froala_attachments';
+    protected $table = 'froala_pending_attachments';
 
     public static function forDraft(string $draftId): Builder
     {
