@@ -54,7 +54,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "FroalaServiceProvider"
+                "Froala\\Nova\\FroalaServiceProvider"
             ]
         }
     },
