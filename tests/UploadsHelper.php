@@ -28,7 +28,7 @@ trait UploadsHelper
 
     protected function regenerateUpload(): void
     {
-        $this->file = UploadedFile::fake()->image('picture' . random_int(1, 100) . '.jpg');
+        $this->file = UploadedFile::fake()->image('picture' . rand(1, 100) . '.jpg');
     }
 
     protected function uploadPendingFile(): TestResponse
@@ -48,10 +48,8 @@ trait UploadsHelper
         ]);
     }
 
-    protected function getAttachmentLocation(bool $preserveFilename = false): string
+    protected function getAttachmentLocation(): string
     {
-        $filename = $preserveFilename ? $this->file->getClientOriginalName() : $this->file->hashName();
-
-        return rtrim(KernelTestCase::PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
+        return rtrim(KernelTestCase::PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->file->hashName();
     }
 }

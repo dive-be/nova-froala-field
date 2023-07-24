@@ -54,18 +54,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Preserve Attachments File Name
-    |--------------------------------------------------------------------------
-    |
-    | Ability to preserve client original file name for uploaded
-    | image, file or video.
-    |
-    */
-
-    'preserve_file_names' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Maximum Possible Size for Uploaded Files
     |--------------------------------------------------------------------------
     |
