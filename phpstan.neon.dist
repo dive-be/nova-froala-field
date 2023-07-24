@@ -1,0 +1,17 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - src/
+
+    level: 6
+
+    checkMissingIterableValueType: false
+
+    checkGenericClassInNonGenericObjectType: false
+
+    ignoreErrors:
+        - '#Model::make.*#'
+        - '#Parameter .* of method Illuminate\\Support\\Collection<int\,Illuminate\\Database\\Eloquent\\Model>::each.*#'
+        - '#Method Froala\\Nova\\Attachments\\Controller::findFieldOrFail\(\) should return Froala\\Nova\\Froala but returns Laravel\\Nova\\Fields\\Field.#'

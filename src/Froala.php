@@ -1,23 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField;
+namespace Froala\Nova;
 
-use Froala\NovaFroalaField\Handlers\AttachedImagesList;
-use Froala\NovaFroalaField\Handlers\DeleteAttachments;
-use Froala\NovaFroalaField\Handlers\DetachAttachment;
-use Froala\NovaFroalaField\Handlers\DiscardPendingAttachments;
-use Froala\NovaFroalaField\Handlers\StorePendingAttachment;
-use Froala\NovaFroalaField\Models\PendingAttachment as FroalaPendingAttachment;
+use Closure;
+use Froala\Nova\Attachments\DeleteAttachments;
+use Froala\Nova\Attachments\DetachAttachment;
+use Froala\Nova\Attachments\DiscardPendingAttachments;
+use Froala\Nova\Attachments\GetAttachedImagesList;
+use Froala\Nova\Attachments\PendingAttachment;
+use Froala\Nova\Attachments\StorePendingAttachment;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Trix\PendingAttachment as TrixPendingAttachment;
 
-class Froala extends Trix
+final class Froala extends Trix
 {
-    public const DRIVER_NAME = 'froala';
+    public const NAME = 'froala-field';
 
-    public $component = 'nova-froala-field';
+    public static bool $runsMigrations = true;
+
+    public $component = self::NAME;
+
+    public $meta = ['options' => []];
 
     /**
      * The callback that should be executed to return attached images list.
@@ -26,40 +31,122 @@ class Froala extends Trix
      */
     public $imagesCallback;
 
-    public function __construct(string $name, ?string $attribute = null, $resolveCallback = null)
+    /**
+     * Ability to pass any existing Froala options to the editor instance.
+     * Refer to the Froala documentation {@link https://www.froala.com/wysiwyg-editor/docs/options}
+     * to view a list of all available options.
+     */
+    public function options(array $options): self
     {
-        parent::__construct($name, $attribute, $resolveCallback);
+        return $this->withMeta(['options' => $options]);
+    }
 
-        $uploadLimits = [
-            'fileMaxSize',
-            'imageMaxSize',
-            'videoMaxSize',
-        ];
+    /**
+     * Specify that file uploads should be allowed.
+     */
+    public function withFiles($disk = null, $path = null): self
+    {
+        $this->withFiles = true;
 
-        $uploadMaxFilesize = $this->getUploadMaxFilesize();
+        return $this
+            ->disk($disk ?? config('froala.disk', $disk))
+            ->path($path ?? config('froala.path', DIRECTORY_SEPARATOR))
+            ->attach(new StorePendingAttachment($this))
+            ->detach(new DetachAttachment())
+            ->delete(new DeleteAttachments($this))
+            ->discard(new DiscardPendingAttachments())
+            ->images(new GetAttachedImagesList($this))
+            ->prunable();
+    }
 
-        foreach ($uploadLimits as $key => $property) {
-            $uploadLimits[$property] = $uploadMaxFilesize;
-            unset($uploadLimits[$key]);
+    /**
+     * Hydrate the given attribute on the model based on the incoming request.
+     */
+    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute): ?Closure
+    {
+        if (is_callable($this->fillCallback)) {
+            return ($this->fillCallback)($request, $model, $attribute, $requestAttribute);
         }
 
-        $this->withMeta([
-            'options' => config('nova.froala-field.options', []) + $uploadLimits,
-            'draftId' => Str::uuid(),
-            'attachmentsDriver' => config('nova.froala-field.attachments_driver'),
-        ]);
+        $this->fillAttributeFromRequest($request, $requestAttribute, $model, $attribute);
+
+        if ($request->has($draftId = "{$this->attribute}DraftId") && $this->withFiles) {
+            return fn () => PendingAttachment::persistAll($request->input($draftId), $model);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get additional meta information to merge with the element payload.
+     */
+    public function meta(): array
+    {
+        return [
+            ...Arr::except($this->meta, 'options'),
+            'draftId' => Str::orderedUuid(),
+            'options' => [
+                ...config('froala.options', []),
+                ...Arr::get($this->meta, 'options', []),
+                ...($this->withFiles ? [] : [
+                    'fileMaxSize' => ($maxSize = $this->getUploadMaxFilesize()),
+                    'fileUpload' => false,
+                    'imageInsertButtons' => ['imageByURL'],
+                    'imageMaxSize' => $maxSize,
+                    'imagePaste' => false,
+                    'imageUpload' => false,
+                    'videoMaxSize' => $maxSize,
+                    'videoUpload' => false,
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Specify the callback that should be used to get attached images list.
+     */
+    public function images(callable $imagesCallback): self
+    {
+        $this->withFiles = true;
+
+        $this->imagesCallback = $imagesCallback;
+
+        return $this;
+    }
+
+    /**
+     * Get the path that the field is stored at on disk.
+     */
+    public function getStorageDir(): string
+    {
+        return config('froala.path', $this->storagePath);
+    }
+
+    /**
+     * Get the disk that the field is stored on.
+     */
+    public function getStorageDisk(): string
+    {
+        return config('froala.disk', $this->disk);
+    }
+
+    /**
+     * Get the full path that the field is stored at on disk.
+     */
+    public function getStoragePath(): string
+    {
+        return DIRECTORY_SEPARATOR;
     }
 
     protected function getUploadMaxFilesize(): int
     {
-        $uploadMaxFilesize = config('nova.froala-field.upload_max_filesize')
-                            ?? ini_get('upload_max_filesize');
+        $uploadMaxFilesize = config('froala.upload_max_filesize') ?? ini_get('upload_max_filesize');
 
         if (is_numeric($uploadMaxFilesize)) {
             return $uploadMaxFilesize;
         }
 
-        $metric = strtoupper(substr($uploadMaxFilesize, -1));
+        $metric = mb_strtoupper(mb_substr($uploadMaxFilesize, -1));
         $uploadMaxFilesize = (int) $uploadMaxFilesize;
 
         return match ($metric) {
@@ -71,127 +158,10 @@ class Froala extends Trix
     }
 
     /**
-     * Ability to pass any existing Froala options to the editor instance.
-     * Refer to the Froala documentation {@link https://www.froala.com/wysiwyg-editor/docs/options}
-     * to view a list of all available options.
-     *
-     * @param array $options
-     * @return self
+     * Configure Froala to not register its migrations.
      */
-    public function options(array $options): self
+    public static function ignoreMigrations(): void
     {
-        return $this->withMeta([
-            'options' => array_merge($this->meta['options'], $options),
-        ]);
-    }
-
-    /**
-     * Specify that file uploads should not be allowed.
-     */
-    public function withFiles($disk = null, $path = '/'): self|static
-    {
-        $this->withFiles = true;
-
-        if (nova_version_at_least('2.7.0')) {
-            $this->disk($disk)->path($path);
-        } else {
-            $this->disk($disk);
-        }
-
-        if (config('nova.froala-field.attachments_driver', self::DRIVER_NAME) !== self::DRIVER_NAME) {
-            $this->images(new AttachedImagesList($this));
-
-            return parent::withFiles($disk, $path);
-        }
-
-        $this->attach(new StorePendingAttachment($this))
-            ->detach(new DetachAttachment)
-            ->delete(new DeleteAttachments($this))
-            ->discard(new DiscardPendingAttachments)
-            ->images(new AttachedImagesList($this))
-            ->prunable();
-
-        return $this;
-    }
-
-    /**
-     * Hydrate the given attribute on the model based on the incoming request.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
-     * @param  string $requestAttribute
-     * @param  object $model
-     * @param  string $attribute
-     * @return \Closure|null
-     */
-    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute): ?\Closure
-    {
-        if (isset($this->fillCallback)) {
-            return call_user_func(
-                $this->fillCallback,
-                $request,
-                $model,
-                $attribute,
-                $requestAttribute
-            );
-        }
-
-        $this->fillAttributeFromRequest(
-            $request,
-            $requestAttribute,
-            $model,
-            $attribute
-        );
-
-        if ($request->{$this->attribute.'DraftId'} && $this->withFiles) {
-            $pendingAttachmentClass =
-                config('nova.froala-field.attachments_driver', self::DRIVER_NAME) === self::DRIVER_NAME
-                ? FroalaPendingAttachment::class
-                : TrixPendingAttachment::class;
-
-            return function () use ($request, $model, $pendingAttachmentClass) {
-                $pendingAttachmentClass::persistDraft(
-                    $request->{$this->attribute.'DraftId'},
-                    $this,
-                    $model
-                );
-            };
-        }
-
-        return null;
-    }
-
-    /**
-     * Specify the callback that should be used to get attached images list.
-     *
-     * @param  callable  $imagesCallback
-     * @return $this
-     */
-    public function images(callable $imagesCallback): static
-    {
-        $this->withFiles = true;
-
-        $this->imagesCallback = $imagesCallback;
-
-        return $this;
-    }
-
-    /**
-     * Get the path that the field is stored at on disk.
-     *
-     * @return string|null
-     */
-    public function getStorageDir(): ?string
-    {
-        return $this->storagePath ?? '/';
-    }
-
-    /**
-     * Get the full path that the field is stored at on disk.
-     *
-     * @return string
-     */
-    public function getStoragePath(): string
-    {
-        return '/';
+        self::$runsMigrations = false;
     }
 }

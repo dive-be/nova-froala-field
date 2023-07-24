@@ -1,66 +1,35 @@
-# This package is abandoned
-
-As of October 2022 we have made the decision to migrate away from Froala. Froala has still not given any concrete plans to migrate to Vue3. Without Vue3 we cannot migrate to Nova 4, and thus we made the decision to migrate to another editor.
-
-Feel free to fork this repository if you want to keep updating it.
-
 <p align="center"><img alt="Nova Froala Field" src=".github/docs/froala-nova.png" width="380"></p>
 
 <p align="center"><strong>Froala WYSIWYG Editor</strong> field for Laravel Nova</p>
 
-[![PHP Checks and Tests](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-php.yml/badge.svg?branch=master)](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-php.yml)
-[![JS Checks and Tests](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-js.yml/badge.svg?branch=master)](https://github.com/PathfinderMediaGroup/nova-froala-field/actions/workflows/ci-js.yml)
-
 ## Introduction
 
-This is a fork of the original `froala/nova-froala-field` repository. The original is no longer maintained. I created this fork because our company needs a working version of Froala in Nova. This fork contains an updated version of Froala (v4) **without** 3rd party plugin support (you can read [here](#3rd-party-integrations) why).
-
-### Upgrading from v3 to v4
-
-This version has some new minimum requirements:
-- `PHP` ^8.0
-- `laravel/framework` ^9.0
-- `laravel/nova` ^3.0
-- `league/flysystem` ^3.0 (default with Laravel 9)
-
-You may replace `"froala/nova-froala-field": "^3.x"` with `"pathfindermediagroup/nova-froala-field": "^4.0"` in your `composer.json` if you were using the old version from Froala. Just make sure to force publish the new assets like so:
-```bash
-php artisan vendor:publish --tag=froala-styles --provider=Froala\\NovaFroalaField\\FroalaFieldServiceProvider --force
-```
-
-You may also remove the `public/vendor/nova/froala` folder from your project, as it is no longer needed or supported.
-
-### Froala WYSIWYG Editor Field
-
-Full support of attaching Images, Files and Videos
-
-![Form Field](.github/docs/form-field.png)
-
-Notifications for _Froala_ events are handled by [Toasted](https://nova.laravel.com/docs/1.0/customization/frontend.html#notifications) which is provided in _Nova_ by default.
-
+This is a fork of the original `froala/nova-froala-field` repository. 
+The original is no longer maintained. We created this fork because our company needs a working version of Froala in Nova.
+This fork contains an updated version of Froala (v4) **without** 3rd party plugin support.
 
 ## Installation
 
 You can install the package into a Laravel application that uses [Nova](https://nova.laravel.com) via composer:
 
 ```bash
-composer require pathfindermediagroup/nova-froala-field
+composer require dive-be/nova-froala-field
 ```
 
 ## Usage
 
-Just use the `Froala\NovaFroalaField\Froala` field in your Nova resource:
+Just use the `Froala\Nova\Froala` field in your Nova resource:
 
 ```php
 namespace App\Nova;
 
-use Froala\NovaFroalaField\Froala;
+use Froala\Nova\Froala;
 
 class Article extends Resource
 {
     // ...
 
-    public function fields(Request $request)
+    public function fields(NovaRequest $request)
     {
         return [
             // ...
@@ -78,13 +47,13 @@ class Article extends Resource
 To change any of config values for _froala field_, publish a config file:
 
 ```bash
-php artisan vendor:publish --tag=config --provider=Froala\\NovaFroalaField\\FroalaFieldServiceProvider
+php artisan vendor:publish --tag=config --provider=Froala\\Nova\\FroalaServiceProvider
 ```
 
 ## Customize Editor Options
 
 For changing any [Available Froala Option](https://www.froala.com/wysiwyg-editor/docs/options)
-edit `nova.froala-field.options` value:
+edit `froala.options` value:
 
 ```php
 /*
@@ -128,7 +97,7 @@ edit `nova.froala-field.options` value:
 If you want to set options only to specific field, just pass them to `options` method:
 
 ```php
-public function fields(Request $request)
+public function fields(NovaRequest $request)
 {
     return [
         // ...
@@ -145,49 +114,14 @@ public function fields(Request $request)
 
 ## Attachments
 
-**Nova Froala Field** provides native attachments driver which works similar to [Trix File Uploads](https://nova.laravel.com/docs/1.0/resources/fields.html#file-uploads), but with ability to optimize images and preserve file names.
-Also you have an ability to switch to the `trix` driver to use its upload system.
+> **Note** If you are not going to use Froala's attachment functionality, you should call the `Froala::ignoreMigrations` method in the register method of your application's `App\Providers\AppServiceProvider` class.
 
-* It's Recommended to use `froala` driver (enabled by default) to be able to use current and future
- additional features for attachments, provided by *Froala*.
+**Nova Froala Field** provides native attachments driver which works similar to [Trix File Uploads](https://nova.laravel.com/docs/1.0/resources/fields.html#file-uploads), but with ability to optimize images.
 
-### Froala Driver
+Run migrations:
 
-To use `froala` driver, publish and run a migration:
-
-```bash
-php artisan vendor:publish --tag=migrations --provider=Froala\\NovaFroalaField\\FroalaFieldServiceProvider 
+```bash 
 php artisan migrate
-```
-
-### Trix Driver
-
-If previously you have used *Trix* attachments and you want to preserve behavior with same tables and handlers
-you can use `trix` driver in config file:
-
-```php
-/*
-|--------------------------------------------------------------------------
-| Editor Attachments Driver
-|--------------------------------------------------------------------------
-|
-| If you have used `Trix` previously and want to save the same flow with
-| `Trix` attachments handlers and database tables you can use
-| "trix" driver.
-|
-| *** Note that "trix" driver doesn't support image optimization
-| and file names preservation.
-|
-| It is recommended to use "froala" driver to be able to automatically
-| optimize uploaded images and preserve attachments file names.
-|
-| Supported: "froala", "trix"
-|
-*/
-
-'attachments_driver' => 'trix'
-
-//...
 ```
 
 ### Attachments Usage
@@ -195,7 +129,7 @@ you can use `trix` driver in config file:
 To allow users to upload images, files and videos, just like with _Trix_ field, chain the `withFiles` method onto the field's definition. When calling the `withFiles` method, you should pass the name of the filesystem disk that photos should be stored on:
 
 ```php
-use Froala\NovaFroalaField\Froala;
+use Froala\Nova\Froala;
 
 Froala::make('Content')->withFiles('public');
 ```
@@ -203,8 +137,7 @@ Froala::make('Content')->withFiles('public');
 And also, in your `app/Console/Kernel.php` file, you should register a [daily job](https://laravel.com/docs/5.7/scheduling) to prune any stale attachments from the pending attachments table and storage:
 
 ```php
-use Froala\NovaFroalaField\Jobs\PruneStaleAttachments;
-
+use Froala\Nova\Attachments\PendingAttachment;
 
 /**
 * Define the application's command schedule.
@@ -214,38 +147,18 @@ use Froala\NovaFroalaField\Jobs\PruneStaleAttachments;
 */
 protected function schedule(Schedule $schedule)
 {
-    $schedule->call(function () {
-        (new PruneStaleAttachments)();
-    })->daily();
+    $schedule->command('model:prune', [
+        '--model' => [PendingAttachment::class],
+    ])->daily();
 }
-```
-
-#### Filenames Preservation
-
-A unique ID is generated by default to serve as the file name according to `store` [method specification](https://laravel.com/docs/master/filesystem#file-uploads).
-If you want to preserve original client filenames for uploaded attachments, change `preserve_file_names` option in config file to `true`.
-
-```php
-/*
-|--------------------------------------------------------------------------
-| Preserve Attachments File Name
-|--------------------------------------------------------------------------
-|
-| Ability to preserve client original file name for uploaded
-| image, file or video.
-|
-*/
-
-'preserve_file_names' => true,
-
-//...
 ```
 
 #### Images Optimization
 
-All uploaded images will be optimized by default by [spatie/image-optimizer](https://github.com/spatie/image-optimizer).
+> **Note** Don't forget to check out [spatie/image-optimizer](https://github.com/spatie/image-optimizer)'s documentation e.g. to install the required binaries on your machine.
 
-You can disable image optimization in config file:
+All uploaded images will be optimized by default by [spatie/image-optimizer](https://github.com/spatie/image-optimizer). 
+You can disable image optimization in config file (not recommended):
 
 ```php
 /*
@@ -261,45 +174,6 @@ You can disable image optimization in config file:
 
 //...
 ```
-
-Or set custom optimization options for any optimizer:
-
-```php
-/*
-|--------------------------------------------------------------------------
-| Image Optimizers Setup
-|--------------------------------------------------------------------------
-|
-| These are the optimizers that will be used by default.
-| You can setup custom parameters for each optimizer.
-|
-*/
-
-'image_optimizers' => [
-    Spatie\ImageOptimizer\Optimizers\Jpegoptim::class => [
-        '-m85', // this will store the image with 85% quality. This setting seems to satisfy Google's Pagespeed compression rules
-        '--strip-all', // this strips out all text information such as comments and EXIF data
-        '--all-progressive', // this will make sure the resulting image is a progressive one
-    ],
-    Spatie\ImageOptimizer\Optimizers\Pngquant::class => [
-        '--force', // required parameter for this package
-    ],
-    Spatie\ImageOptimizer\Optimizers\Optipng::class => [
-        '-i0', // this will result in a non-interlaced, progressive scanned image
-        '-o2', // this set the optimization level to two (multiple IDAT compression trials)
-        '-quiet', // required parameter for this package
-    ],
-    Spatie\ImageOptimizer\Optimizers\Svgo::class => [
-        '--disable=cleanupIDs', // disabling because it is known to cause troubles
-    ],
-    Spatie\ImageOptimizer\Optimizers\Gifsicle::class => [
-        '-b', // required parameter for this package
-        '-O3', // this produces the slowest but best results
-    ],
-],
-```
-
-> Image optimization currently supported only for local filesystems
 
 ### Upload Max Filesize
 
@@ -331,7 +205,7 @@ You can set max upload filesize for attachments. If set to `null`, max upload fi
 According to _Froala_ [Display Edited Content](https://www.froala.com/wysiwyg-editor/docs/overview#frontend) documentation you should publish _Froala_ styles:
 
 ```bash
-php artisan vendor:publish --tag=froala-styles --provider=Froala\\NovaFroalaField\\FroalaFieldServiceProvider 
+php artisan vendor:publish --tag=froala-styles --provider=Froala\\Nova\\FroalaServiceProvider 
 ```
 
 include into view where an edited content is shown:
@@ -354,7 +228,7 @@ Also, you should make sure that you put the edited content inside an element tha
 You have an ability to show field content on resource index page in popup window:
 
 ```php
-use Froala/NovaFroalaField/Froala;
+use Froala/Nova/Froala;
 
 Froala::make('Content')->showOnIndex();
 ```
@@ -365,7 +239,7 @@ Just click **Show Content**
 
 ## License Key
 
-To setup your license key, uncomment `key` option in the config file and set `FROALA_KEY` environment variable
+To setup your license key, set `FROALA_KEY` environment variable:
 
 ```php
 // ...
@@ -374,10 +248,6 @@ To setup your license key, uncomment `key` option in the config file and set `FR
     // ...
 ],
 ```
-
-## 3rd Party Integrations
-
-I decided to remove 3rd party integrations like embedly and Tui. The reason for this being is that I wanted an updated version of Froala in Nova. I could not get it to work properly with the 3rd party integrations. I do not use them, and thus I am not inclined to spend more time on trying to get them to work. If you know how to do this, feel free to create a pull request.
 
 ## Advanced
 
@@ -400,13 +270,13 @@ to all callbacks provided in `window.froala.events`, the context of _VueJS_ form
 After that, load the js file into _Nova_ scripts in `NovaServiceProvider::boot` method:
 
 ```php
-public function boot()
+public function boot(): void
 {
-    parent::boot();
-
     Nova::serving(function (ServingNova $event) {
         Nova::script('froala-event-handlers', public_path('path/to/js/file.js'));
     });
+    
+    parent::boot();
 }
 ```
 
@@ -436,17 +306,17 @@ Froala::make('Content')
 You may get started with this package as follows (after cloning the repository):
 ```bash
 composer install
-yarn install
+npm install
 ```
 
 ### Fixing code-style
 PHP
 ```bash
-composer cgl
+composer format
 ```
 JS
 ```bash
-yarn format
+npm run format
 ```
 
 ### Testing
@@ -457,23 +327,17 @@ composer test
 
 ### Building dev assets
 ```bash
-yarn dev
+npm run dev
 ```
 
 ### Building production assets
 ```bash
-yarn prod
+npm run prod
 ```
 
 ## Contributing
 
 To contribute, simply make a pull request to this repository with your changes. Make sure they are documented well in your pull request description.
-
-## Credits
-
-- [Slava Razum](https://github.com/slavarazum) For creating the original plugin
-- [Woeler](https://github.com/slavarazum) For updating the abandoned plugin to Froala version 4, Laravel version 9 and Mix version 6
-- [All Contributors][link-contributors]
 
 ## License
 

@@ -1,42 +1,39 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Froala\NovaFroalaField\Tests;
+namespace Tests;
 
-use function Froala\NovaFroalaField\nova_version_at_least;
+use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 
+/** @mixin KernelTestCase */
 trait UploadsHelper
 {
-    protected $file;
+    protected string $draftId;
 
-    protected $draftId;
+    protected File $file;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        Storage::fake(TestCase::DISK);
+        Storage::fake(KernelTestCase::DISK);
 
-        $this->draftId = Str::uuid();
+        $this->draftId = (string) Str::uuid();
 
         $this->regenerateUpload();
     }
 
-    protected function regenerateUpload()
+    protected function regenerateUpload(): void
     {
-        $this->file = UploadedFile::fake()->image('picture'.random_int(1, 100).'.jpg');
+        $this->file = UploadedFile::fake()->image('picture' . rand(1, 100) . '.jpg');
     }
 
     protected function uploadPendingFile(): TestResponse
     {
-        $url = config('nova.froala-field.attachments_driver') === 'trix'
-            ? '/nova-api/articles/trix-attachment/content'
-            : 'nova-vendor/froala-field/articles/attachments/content';
-
-        return $this->json('POST', $url, [
+        return $this->postJson('nova-vendor/froala/articles/attachments/content', [
             'draftId' => $this->draftId,
             'attachment' => $this->file,
         ]);
@@ -44,17 +41,15 @@ trait UploadsHelper
 
     protected function storeArticle(): TestResponse
     {
-        return $this->json('POST', 'nova-api/articles', [
+        return $this->postJson('nova-api/articles', [
             'title' => 'Some title',
             'content' => 'Some content',
             'contentDraftId' => $this->draftId,
         ]);
     }
 
-    protected function getAttachmentLocation($preserveFilename = false): string
+    protected function getAttachmentLocation(): string
     {
-        $filename = $preserveFilename ? $this->file->getClientOriginalName() : $this->file->hashName();
-
-        return nova_version_at_least('2.7.0') ? rtrim(TestCase::PATH, '/').'/'.$filename : $filename;
+        return rtrim(KernelTestCase::PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->file->hashName();
     }
 }
