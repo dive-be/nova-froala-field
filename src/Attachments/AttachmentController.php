@@ -11,7 +11,7 @@ final readonly class AttachmentController extends Controller
     /** @throws NotFoundHttpException */
     public function destroy(NovaRequest $request): Response
     {
-        ($this->getOrThrow($request)->detachCallback)($request);
+        ($this->findFieldOrFail($request)->detachCallback)($request);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

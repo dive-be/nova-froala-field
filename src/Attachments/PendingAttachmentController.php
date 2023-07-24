@@ -12,7 +12,7 @@ final readonly class PendingAttachmentController extends Controller
     /** @throws NotFoundHttpException */
     public function store(NovaRequest $request): JsonResponse
     {
-        $link = ($this->getOrThrow($request)->attachCallback)($request);
+        $link = ($this->findFieldOrFail($request)->attachCallback)($request);
 
         return new JsonResponse(['link' => $link]);
     }
@@ -20,7 +20,7 @@ final readonly class PendingAttachmentController extends Controller
     /** @throws NotFoundHttpException */
     public function destroy(NovaRequest $request): Response
     {
-        ($this->getOrThrow($request)->discardCallback)($request);
+        ($this->findFieldOrFail($request)->discardCallback)($request);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

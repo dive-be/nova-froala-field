@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 abstract readonly class Controller
 {
     /** @throws NotFoundHttpException */
-    protected function getOrThrow(NovaRequest $request): Froala
+    protected function findFieldOrFail(NovaRequest $request): Froala
     {
         return $request
             ->newResource()

@@ -12,7 +12,7 @@ final readonly class ImageManagerController extends Controller
     /** @throws NotFoundHttpException */
     public function index(NovaRequest $request): JsonResponse
     {
-        $images = ($this->getOrThrow($request)->imagesCallback)($request);
+        $images = ($this->findFieldOrFail($request)->imagesCallback)($request);
 
         return new JsonResponse($images);
     }
@@ -20,7 +20,7 @@ final readonly class ImageManagerController extends Controller
     /** @throws NotFoundHttpException */
     public function destroy(NovaRequest $request): Response
     {
-        ($this->getOrThrow($request)->detachCallback)($request);
+        ($this->findFieldOrFail($request)->detachCallback)($request);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }
