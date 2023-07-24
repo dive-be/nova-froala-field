@@ -4,7 +4,6 @@ namespace Froala\Nova\Attachments;
 
 use Froala\Nova\Froala;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 final readonly class StorePendingAttachment
@@ -19,12 +18,10 @@ final readonly class StorePendingAttachment
             OptimizerChainFactory::create()->optimize($attachment->getPathname());
         }
 
-        $pendingAttachment = PendingAttachment::create([
+        return PendingAttachment::create([
+            'attachment' => $attachment->store($this->field->getStorageDir(), $disk = $this->field->getStorageDisk()),
             'draft_id' => $request->input('draftId'),
-            'attachment' => $attachment->store($this->field->getStorageDir(), $this->field->getStorageDisk()),
-            'disk' => $this->field->getStorageDisk(),
-        ]);
-
-        return Storage::disk($this->field->getStorageDisk())->url($pendingAttachment->attachment);
+            'disk' => $disk,
+        ])->url;
     }
 }
