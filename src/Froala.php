@@ -84,18 +84,19 @@ final class Froala extends Trix
     {
         return [
             ...Arr::except($this->meta, 'options'),
-            'draftId' => Str::orderedUuid(),
+            'draftId' => (string) Str::orderedUuid(),
             'options' => [
                 ...config('froala.options', []),
                 ...Arr::get($this->meta, 'options', []),
-                ...($this->withFiles ? [] : [
+                ...($this->withFiles ? [
                     'fileMaxSize' => ($maxSize = $this->getUploadMaxFilesize()),
+                    'imageMaxSize' => $maxSize,
+                    'videoMaxSize' => $maxSize,
+                ] : [
                     'fileUpload' => false,
                     'imageInsertButtons' => ['imageByURL'],
-                    'imageMaxSize' => $maxSize,
                     'imagePaste' => false,
                     'imageUpload' => false,
-                    'videoMaxSize' => $maxSize,
                     'videoUpload' => false,
                 ]),
             ],

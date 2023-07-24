@@ -28,7 +28,7 @@ export default {
 
     computed: {
         options() {
-            return _.merge(this.field.options, this.defaultConfig(), window.froala || {});
+            return _.merge(window.froala || {}, this.field.options, this.defaultConfig());
         },
     },
 
