@@ -82,16 +82,24 @@ final class Froala extends Trix
      */
     public function meta(): array
     {
-        $maxSize = $this->getUploadMaxFilesize();
-
-        return array_merge([
+        return [
+            ...Arr::except($this->meta, 'options'),
             'draftId' => Str::orderedUuid(),
-            'options' => array_merge(
-                config('froala.options', []),
-                Arr::get($this->meta, 'options', []),
-                ['fileMaxSize' => $maxSize, 'imageMaxSize' => $maxSize, 'videoMaxSize' => $maxSize]
-            ),
-        ], Arr::except($this->meta, 'options'));
+            'options' => [
+                ...config('froala.options', []),
+                ...Arr::get($this->meta, 'options', []),
+                ...($this->withFiles ? [] : [
+                    'fileMaxSize' => ($maxSize = $this->getUploadMaxFilesize()),
+                    'fileUpload' => false,
+                    'imageInsertButtons' => ['imageByURL'],
+                    'imageMaxSize' => $maxSize,
+                    'imagePaste' => false,
+                    'imageUpload' => false,
+                    'videoMaxSize' => $maxSize,
+                    'videoUpload' => false,
+                ]),
+            ],
+        ];
     }
 
     /**
