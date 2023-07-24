@@ -22,7 +22,7 @@
         "laravel/nova": "^4.12",
         "league/flysystem": "^3.0",
         "nova-kit/nova-packages-tool": "^1.11",
-        "spatie/image-optimizer": "^1.6"
+        "spatie/image-optimizer": "^1.7"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
