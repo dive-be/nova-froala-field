@@ -44,7 +44,7 @@ export default {
 
     methods: {
         toggle() {
-            this.expanded = ! this.expanded;
+            this.expanded = !this.expanded;
         },
     },
 };
