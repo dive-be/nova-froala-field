@@ -4,9 +4,8 @@
 
 ## Introduction
 
-This is a fork of the original `froala/nova-froala-field` repository. 
-The original is no longer maintained. We created this fork because our company needs a working version of Froala in Nova.
-This fork contains an updated version of Froala (v4) **without** 3rd party plugin support.
+This is a fork of the original `froala/nova-froala-field` repository.
+This minimalistic version will be maintained indefinitely until all of our projects are migrated off Froala.
 
 ## Installation
 
