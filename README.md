@@ -25,11 +25,11 @@ namespace App\Nova;
 
 use Froala\Nova\Froala;
 
-class Article extends Resource
+final class Article extends Resource
 {
     // ...
 
-    public function fields(NovaRequest $request)
+    public function fields(NovaRequest $request): array
     {
         return [
             // ...
@@ -134,18 +134,12 @@ use Froala\Nova\Froala;
 Froala::make('Content')->withFiles('public');
 ```
 
-And also, in your `app/Console/Kernel.php` file, you should register a [daily job](https://laravel.com/docs/5.7/scheduling) to prune any stale attachments from the pending attachments table and storage:
+And also, in your `app/Console/Kernel.php` file, you should register a [daily job](https://laravel.com/docs/10.x/scheduling) to prune any stale attachments from the pending attachments table and storage:
 
 ```php
 use Froala\Nova\Attachments\PendingAttachment;
 
-/**
-* Define the application's command schedule.
-*
-* @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-* @return void
-*/
-protected function schedule(Schedule $schedule)
+protected function schedule(Schedule $schedule): void
 {
     $schedule->command('model:prune', [
         '--model' => [PendingAttachment::class],
@@ -338,6 +332,11 @@ npm run prod
 ## Contributing
 
 To contribute, simply make a pull request to this repository with your changes. Make sure they are documented well in your pull request description.
+
+## Credits
+
+- [Muhammed Sarı](https://github.com/mabdullahsari)
+- [All Contributors](../../contributors)
 
 ## License
 
