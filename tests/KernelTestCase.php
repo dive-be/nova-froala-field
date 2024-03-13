@@ -16,13 +16,12 @@ abstract class KernelTestCase extends TestCase
 {
     use RefreshDatabase;
 
-    final public const DISK = 'public';
+    final public const string DISK = 'public';
 
-    final public const PATH = 'subpath';
+    final public const string PATH = 'subpath';
 
     protected function defineDatabaseMigrations(): void
     {
-        $this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 
@@ -40,9 +39,6 @@ abstract class KernelTestCase extends TestCase
     protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set([
-            'database.connections.testbench' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''],
-            'database.default' => 'testbench',
-
             'froala.disk' => self::DISK,
             'froala.path' => self::PATH,
 

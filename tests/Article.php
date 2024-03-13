@@ -6,7 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 final class Article extends Model
 {
-    protected $guarded = ['id'];
-
     public $timestamps = false;
 }

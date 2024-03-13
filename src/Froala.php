@@ -16,7 +16,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 
 final class Froala extends Trix
 {
-    public const NAME = 'froala-field';
+    public const string NAME = 'froala-field';
 
     public static bool $runsMigrations = true;
 

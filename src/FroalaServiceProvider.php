@@ -8,7 +8,7 @@ use NovaKit\NovaPackagesTool\LaravelServiceProvider;
 
 final class FroalaServiceProvider extends AggregateServiceProvider
 {
-    public const NAME = 'froala';
+    public const string NAME = 'froala';
 
     protected $providers = [LaravelServiceProvider::class];
 
