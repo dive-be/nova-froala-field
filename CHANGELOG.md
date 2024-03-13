@@ -2,6 +2,16 @@
 
 All notable changes to `nova-froala-field` will be documented in this file.
 
+## 1.1.0 - 2024-03-13
+
+### Added
+
+- PHP 8.3 support
+
+### Removed
+
+- PHP 8.2 support
+
 ## 1.0.0 - 2023-07-24
 
 This fork is a continuation of the original, abandoned repository. 
