@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
  * @property Carbon $created_at
  * @property string $disk
  * @property string $draft_id
- * @property int    $id
+ * @property int $id
  * @property Carbon $updated_at
  * @property string $url
  */

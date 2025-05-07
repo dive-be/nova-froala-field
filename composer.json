@@ -20,17 +20,17 @@
     ],
     "homepage": "https://github.com/dive-be/nova-froala-field",
     "require": {
-        "php": "~8.3",
-        "laravel/nova": "^4.12",
+        "php": "~8.4",
+        "laravel/nova": "^4.35.9",
         "league/flysystem": "^3.0",
-        "nova-kit/nova-packages-tool": "^1.11",
+        "nova-kit/nova-packages-tool": "^1.17.4",
         "spatie/image-optimizer": "^1.7"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
-        "larastan/larastan": "^2.0",
-        "orchestra/testbench": "^9.0",
-        "phpunit/phpunit": "^11.0"
+        "larastan/larastan": "^3.0",
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^12.0"
     },
     "repositories": [
         {

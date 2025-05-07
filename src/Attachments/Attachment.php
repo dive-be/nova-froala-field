@@ -10,13 +10,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * @property Model  $attachable
- * @property int    $attachable_id
+ * @property Model $attachable
+ * @property int $attachable_id
  * @property string $attachable_type
  * @property string $attachment
  * @property Carbon $created_at
  * @property string $disk
- * @property int    $id
+ * @property int $id
  * @property Carbon $updated_at
  * @property string $url
  */

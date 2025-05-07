@@ -3,8 +3,9 @@
 use Froala\Nova\Attachments\AttachmentController;
 use Froala\Nova\Attachments\ImageManagerController;
 use Froala\Nova\Attachments\PendingAttachmentController;
+use Illuminate\Routing\Router;
 
-/** @var \Illuminate\Routing\Router $router */
+/** @var Router $router */
 $router->get('{resource}/image-manager', [ImageManagerController::class, 'index']);
 $router->delete('{resource}/image-manager', [ImageManagerController::class, 'destroy']);
 

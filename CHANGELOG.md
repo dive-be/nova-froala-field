@@ -2,6 +2,16 @@
 
 All notable changes to `nova-froala-field` will be documented in this file.
 
+## 1.2.0 - 2025-05-07
+
+### Added
+
+- PHP 8.4 support
+
+### Removed
+
+- PHP 8.3 support
+
 ## 1.1.0 - 2024-03-13
 
 ### Added
