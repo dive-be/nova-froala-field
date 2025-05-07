@@ -2,6 +2,16 @@
 
 All notable changes to `nova-froala-field` will be documented in this file.
 
+## 1.3.0 - 2025-05-07
+
+### Added
+
+- Nova 5 support
+
+### Removed
+
+- Nova 4 support
+
 ## 1.2.0 - 2025-05-07
 
 ### Added
