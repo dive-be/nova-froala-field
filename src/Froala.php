@@ -2,7 +2,6 @@
 
 namespace Froala\Nova;
 
-use Closure;
 use Froala\Nova\Attachments\DeleteAttachments;
 use Froala\Nova\Attachments\DetachAttachment;
 use Froala\Nova\Attachments\DiscardPendingAttachments;
@@ -62,7 +61,7 @@ final class Froala extends Trix
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      */
-    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute): ?Closure
+    protected function fillAttribute(NovaRequest $request, string $requestAttribute, object $model, string $attribute): ?callable
     {
         if (is_callable($this->fillCallback)) {
             return ($this->fillCallback)($request, $model, $attribute, $requestAttribute);

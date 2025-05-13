@@ -4,13 +4,10 @@ namespace Froala\Nova;
 
 use Illuminate\Support\AggregateServiceProvider;
 use Laravel\Nova\Nova;
-use NovaKit\NovaPackagesTool\LaravelServiceProvider;
 
 final class FroalaServiceProvider extends AggregateServiceProvider
 {
     public const string NAME = 'froala';
-
-    protected $providers = [LaravelServiceProvider::class];
 
     private string $name = self::NAME;
 
